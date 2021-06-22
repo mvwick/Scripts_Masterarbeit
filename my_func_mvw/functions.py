@@ -24,7 +24,6 @@ def get_abspath(basepath):
     for entry in basepath:
         df_list.append(entry)
     return (df_list)
-get_abspath("sdfdsf")
 
 def all_days_of_year(year, day_format="%Y-%m-%d"):
     """returns list with all days of a year in day_format (used in .strftime)"""
