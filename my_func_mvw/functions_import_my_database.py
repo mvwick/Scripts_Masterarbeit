@@ -131,3 +131,24 @@ def import_my_database_2018_csv(path_to_my_database_2018_csv):
         data_2018[cable_length][channel]=one_file
 
     return data_2018
+
+
+def merge_data_year(list_data_years):
+    """input the different year dics as a list
+    Merge the different year dics into one
+    """
+    data = {}
+
+    for data_20xx in list_data_years:
+        for channel in data_20xx.keys():
+
+            if channel in data.keys():
+                data[channel] = pd.concat([data[channel], data_20xx[channel]], axis = 0)
+
+            else: # channel not in data dic
+                data[channel] = data_20xx[channel]
+
+    #eventle noch sort index machen; the seperate years are already sorted by index during saving
+    return data
+
+
