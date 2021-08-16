@@ -5,6 +5,7 @@
 copy /Y "C:\Users\Mathis\Desktop\Masterarbeit\Scripts\my_database_script.ipynb" "C:\Users\Mathis\Desktop\Masterarbeit\Alsdorf\Daten\my_database"
 copy /Y "C:\Users\Mathis\Desktop\Masterarbeit\Scripts\analyse_shaft_temperature.ipynb" "C:\Users\Mathis\Desktop\Masterarbeit\Alsdorf\Daten\my_database"
 copy /Y "C:\Users\Mathis\Desktop\Masterarbeit\Scripts\compare_both_devices.ipynb" "C:\Users\Mathis\Desktop\Masterarbeit\Alsdorf\Daten\my_database"
+copy /Y "C:\Users\Mathis\Desktop\Masterarbeit\Scripts\analyse_ch1-4_my_database_alsdorf.ipynb" "C:\Users\Mathis\Desktop\Masterarbeit\Alsdorf\Daten\my_database"
 copy /Y "C:\Users\Mathis\Desktop\Masterarbeit\Scripts\my_func_mvw\functions_import_my_database.py" "C:\Users\Mathis\Desktop\Masterarbeit\Alsdorf\Daten\my_database\my_func_mvw"
 copy /Y "C:\Users\Mathis\Desktop\Masterarbeit\Scripts\my_func_mvw\functions_measurements_per_day.py" "C:\Users\Mathis\Desktop\Masterarbeit\Alsdorf\Daten\my_database\my_func_mvw"
 copy /Y "C:\Users\Mathis\Desktop\Masterarbeit\Scripts\my_func_mvw\functions.py" "C:\Users\Mathis\Desktop\Masterarbeit\Alsdorf\Daten\my_database\my_func_mvw"
