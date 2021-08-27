@@ -11,6 +11,8 @@ plt.style.use("seaborn")
 import matplotlib.dates as mdates
 import matplotlib.patches as patches
 from collections import defaultdict
+import math
+from copy import deepcopy
 
 def get_abspath(basepath):
     """Get the files you need to import into your script with Path
@@ -318,19 +320,20 @@ def check_processed_data(channels,data_all_processed, gap_begin=1661, gap_end=21
         print(f"At Index: {index_counter}")
         print()
     
-    def check_diff_dics(allowed_diff_x_min,min,print_timediff_warning=print_timediff_warning, my_Warning = my_Warning):
+    def check_diff_dics(allowed_diff_x_min,minut,print_timediff_warning=print_timediff_warning, my_Warning = my_Warning):
         for channelpair in allowed_diff_x_min:
             index_counter=0
             for timediff in allowed_diff_x_min[channelpair]:
-                if timediff > timedelta(minutes=min) or timediff < timedelta(minutes=min-1):
+                #-before second timedelta to allow timediff of 0
+                if timediff > timedelta(minutes=minut) or timediff < timedelta(minutes=minut-1):
                     print_timediff_warning(channelpair, timediff, index_counter)
                     my_Warning = True
                 index_counter+=1
         return my_Warning
 
-    my_Warning = check_diff_dics(allowed_diff_5_min, min=5)
-    my_Warning = check_diff_dics(allowed_diff_9_min, min=9)
-    my_Warning = check_diff_dics(allowed_diff_13_min,min=13) # has only one channelpair
+    my_Warning = check_diff_dics(allowed_diff_5_min, minut=5)
+    my_Warning = check_diff_dics(allowed_diff_9_min, minut=9)
+    my_Warning = check_diff_dics(allowed_diff_13_min,minut=13) # has only one channelpair
     print("Check number date measurements: done")
     #------------------------------------------------------------------------------------------------------------------------------
     if my_Warning == True: # Print Warning if one check was wrong
@@ -464,3 +467,102 @@ def const_shift_data(channels,calibration_segments, calibration_segments_mean_co
         data_all_processed_constshifted[chan] = round(final_dataframe,1)
 
     return data_all_processed_constshifted
+
+def add_nan_val_in_datagaps(data_chan):
+    """biggest problem the searching for gaps is static.
+    But when measurement sheme of dts device changes this is not valid.
+    I do not plan to change this because I just need this function for nicer looking plots
+    Solution: resample dataframe to bigger timegapps"""
+    data_chan_new=deepcopy(data_chan)
+    diff = data_chan.index[1:] - data_chan.index[:-1]
+    
+    index_datagaps=[]
+    for i in range(len(diff)):
+        bo = diff[i] > timedelta(minutes=35)
+        if bo == True:
+            index_datagaps.append(i)
+            #print(i)#;print(diff[i]) #i gibt einem die position des Datums ab welchem danach die Lücke ist
+
+    # add values in data gaps
+    n_appended_values = 0 # count the number of values I add to the dataframe
+    for index in index_datagaps:
+        index_corrected = index + n_appended_values # the dataframe gets new values in other date gaps before this one
+        # number of dates with nan, that will be added behin the index position
+        # round down and minus 1 to be sure I dont add a nan behind an existing date - deleted this feature
+        n_nan_dates = math.floor(diff[index] / timedelta(minutes=32))
+        n_appended_values += n_nan_dates
+        list_nan = [np.nan] * n_nan_dates # list of nan
+
+        # add nan's in data gaps, by creating new datapoints with a timedifference of 3 min.
+        # create dataframe which contains the dates and nan values
+        #new_val = pd.DataFrame({data_chan.columns[0]: list_nan, df_Tlogger.columns[1]: list_nan}) #, df_Tlogger.columns[2]: list_nan}
+        #new_val.index = [data_chan.index[index_corrected] + timedelta(minutes=x*35) for x in range(1,n_nan_dates+1)]
+        new_index = [data_chan_new.index[index_corrected] + timedelta(minutes=x*33) for x in range(1,n_nan_dates+1)]
+        new_val=pd.DataFrame(index=new_index,columns=data_chan.columns)
+        
+
+        # add nan values to Tlogger dataframe and sort it
+        data_chan_new = pd.concat([data_chan_new, new_val],axis=0).sort_index()
+    print(f"{n_appended_values} dates with nan have been added")
+
+
+    # Check if everything worked correct
+    # find data gaps
+    diff = data_chan_new.index[1:] - data_chan_new.index[:-1]
+    for i in range(len(diff)):
+        bo = diff[i] > timedelta(minutes=35)
+        if bo == True:
+            print("There are still some indexes missing:")
+            print(i);print(diff[i]);print() #i gibt einem die position des Datums ab welchem danach die Lücke ist
+    
+    return data_chan_new
+
+def carpet_plot_with_gaps(data_input,channels,title_prefix="",sample_hours=3):
+    """you shouldnt use sample_hours smaller than 1. Could cause unexpected behaviour."""
+    # add nan values in gaps so the gaps appear in the plots
+    data_all_processed_nan={}
+    for chan in channels:
+        print(chan)
+        data_all_processed_nan[chan] = add_nan_val_in_datagaps(data_input[chan])
+        print()
+
+    # Check my processed data - check function needs to be slightly adapted
+    #just_for_test={}
+    #for chan in ["5","6","7","8"]:
+    #    just_for_test[chan]=data_all_processed_nan[chan].resample("3H").ffill()
+    #my_Warning = check_processed_data(channels=["5","6","7","8"], data_all_processed = just_for_test,gap_begin=0,gap_end=0)
+
+    fig,axs=plt.subplots(4,1,figsize=(16,22))
+
+    for chan in channels:
+        data=data_all_processed_nan[chan].resample(f"{sample_hours}H").ffill()
+        print(f"Number of dates in Channel {chan}: {len(data.index)}")
+        depth=data.columns
+        date = data.index.to_series()
+        # Datum-Ticks auf x-Achse und Farbskala
+        starti = depth[0]
+        stopi = depth[-1]
+        xax3 = mdates.date2num(date)
+        xstart = xax3[0]
+        xstop  = xax3[-1]
+
+        axs[int(chan)-5].set_title(title_prefix + f'of Channel {chan}\nresampled to {sample_hours} hour data gaps', fontsize = 12)
+        axs[int(chan)-5].grid(False) #axs[0,1].grid(color = '#10366f', alpha = 0.1)
+        caxa = axs[int(chan)-5].imshow(data.transpose(), interpolation = 'gaussian', extent = [xstart, xstop, stopi, starti],
+                        cmap = 'viridis', aspect = 'auto', vmin = 15, vmax = 35) 
+        axs[int(chan)-5].set_ylabel("Length [m]")
+        axs[int(chan)-5].tick_params(axis="x", which='both',length=4,color="grey")
+
+
+    cbax = fig.add_axes([0.92, 0.15, 0.015, 0.7])
+    cbar = fig.colorbar(caxa, cax = cbax, orientation = 'vertical', fraction = 0.05, pad = - 0.05)
+    cbar.set_label('Temperature [°C]', rotation = 0, fontsize = 9, labelpad = -20,  y = 1.03)
+
+    axs[0].sharex(axs[3])
+    axs[1].sharex(axs[3])
+    axs[2].sharex(axs[3])
+
+    axs[3].tick_params(axis = 'x', labelrotation = 0)
+    axs[3].xaxis_date()
+    date_format = mdates.DateFormatter('%Y-%m-%d')
+    axs[3].xaxis.set_major_formatter(date_format)
