@@ -155,6 +155,8 @@ def write_pickle(path,data):
 def temp_watertank_func(x, df_Tlogger, channel_name = "Channel1-PT100_rolling_mean"):
     """returns Temperature of Watertank at given time x, of the moving avearage values
     this is not really a matheamtical function, but I named it like this when I was using a polynomial function
+
+    x should be a list
     """
     # find nearest date in moving avearge
     temp = []
@@ -163,6 +165,17 @@ def temp_watertank_func(x, df_Tlogger, channel_name = "Channel1-PT100_rolling_me
         Temperature = df_Tlogger[channel_name][date_name]
         Temperature_round = round(Temperature, 7) #round to 7s decimal place
         temp.append(Temperature_round)
+
+        # check timediff
+        timediff = date - pd.to_datetime(date_name)
+        if date > pd.to_datetime(date_name):
+            if timediff > timedelta(minutes=5):
+                print("Warning1 from temp_watertank_func: timediff larger than 5 minutes")
+        elif date < pd.to_datetime(date_name):
+            if -(timediff) > timedelta(minutes=5):
+                print("Warning2 from temp_watertank_func: timediff larger than 5 minutes")
+
+
     return temp
 
 def random_date(start, end):
@@ -276,6 +289,7 @@ def check_processed_data(channels,data_all_processed, gap_begin=1661, gap_end=21
     allowed_diff_5_min={}
     allowed_diff_9_min={}
     allowed_diff_13_min={}
+
     if channels == ["1","2","3","4"]:
         allowed_diff_5_min["2 - 1"]  = a["2"].index - a["1"].index
         allowed_diff_5_min["3 - 2"]  = a["3"].index - a["2"].index
@@ -283,6 +297,7 @@ def check_processed_data(channels,data_all_processed, gap_begin=1661, gap_end=21
         allowed_diff_9_min["4 - 2"]  = a["4"].index - a["2"].index
         allowed_diff_9_min["3 - 1"]  = a["3"].index - a["1"].index
         allowed_diff_13_min["4 - 1"] = a["4"].index - a["1"].index
+
     elif channels == ["5","6","7","8"]:
         # drop some dates for the check, because 5 and 6 have a data gap in between due to EGRT from Solexperts
         # now added as input
@@ -332,6 +347,8 @@ def calc_mean_for_each_segment(channels, calibration_segments, watertank_diff_lo
     measurements close to borders are left out.
     the returned date variable also left put dates!
     """
+    # erstmal checken ob segment in logger range ist, sonst vorheriges nehmen
+
     calibration_segments_mean_correction = {} # same order as in calibration_segments
     calibration_segments_mean_correction_dates = {}
     for chan in channels:
@@ -356,9 +373,9 @@ def calc_mean_for_each_segment(channels, calibration_segments, watertank_diff_lo
 
 def plot_segments_mean_correction(calibration_segments_mean_correction,dates,calibration_segments_mean_correction_dates,watertank_diff_log_data_all,df_Tlogger_PT100,watertank_len,ymax=5, ymin=-15):
     """"""
-    fig,axs=plt.subplots(1,1,figsize=(18,6))
+    fig,axs=plt.subplots(1,1,figsize=(16,5))
     # Plot border calibration segments
-    plt.vlines(dates,ymin,ymax,colors="black",linestyle=":")
+    plt.vlines(dates,ymin,ymax,colors="black",linestyle=":", label="correction segment borders")
 
     # Plot mean shift for calibration segments seperate
     for chan in calibration_segments_mean_correction.keys():
@@ -374,21 +391,22 @@ def plot_segments_mean_correction(calibration_segments_mean_correction,dates,cal
                 # I could also just use date_border in hlines
                 if segment_number == 0:
                     start = pd.to_datetime("2021-06-01 19:00:00")
-                axs.hlines(segment_mean, start, end, color="black", linestyle="--")
+                axs.hlines(segment_mean, start, end, color="black", linestyle="--", label="mean correction")
             segment_number+=1
 
         x=watertank_diff_log_data_all[chan].columns
         y=watertank_diff_log_data_all[chan].loc[watertank_len[0]]
-        axs.plot(x,y,label=f"Correction for channel {chan}")
+        axs.plot(x,y,label=f"correction for channel {chan}")
 
     # plot watertank Temp for comparisson
-    mean = np.nanmean(df_Tlogger_PT100["Channel1-Watertank_PT100"].values)
-    y=df_Tlogger_PT100["Channel1-Watertank_PT100"].values - mean
-    x_dates=df_Tlogger_PT100["Channel1-Watertank_PT100"].index
-    axs.plot(x_dates,y,color="black", label="watertank")
+    name="Channel1-PT100_rolling_mean"
+    mean = np.nanmean(df_Tlogger_PT100[name].values)
+    y=df_Tlogger_PT100[name].values - mean
+    x_dates=df_Tlogger_PT100[name].index
+    axs.plot(x_dates,y,color="black", label="water tank\nshifted to mean = 0")
 
 
-    # Erstmal weglassen imPlot
+    # Erstmal weglassen im Plot
     # plot avearagefirst watertank shift
     # for chan in watertank_diff_log_avearagefirst.keys():
     #     y=watertank_diff_log_avearagefirst[chan].loc[watertank_len[0]]
@@ -396,13 +414,19 @@ def plot_segments_mean_correction(calibration_segments_mean_correction,dates,cal
     #     axs.plot([x[0],x[-1]],[y.mean(),y.mean()],color="black",linestyle="--")
     #     plt.plot(x,y,label=f"Correction for avearagefirst: {chan}")
 
-    axs.set_title("Compare watertank correction, only watertank curve shifted to mean = 0")
+    axs.set_title("Analyse Water Tank Correction", fontsize=13)
     axs.set_xlabel("Date")
-    axs.set_ylabel("Correction [°C]")
+    axs.set_ylabel("Temperature [°C]")
     axs.set_ylim(ymin,ymax)
-    axs.legend()
-
-    plt.show()
+    # get labels for legend to remove duplicates
+    # https://stackoverflow.com/questions/13588920/stop-matplotlib-repeating-labels-in-legend
+    handles, labels = plt.gca().get_legend_handles_labels()
+    by_label = dict(zip(labels, handles)) # but them in dictionary: uniqueness, multiple labels are dropped
+    # make legend looking nicer
+    legend = axs.legend(by_label.values(), by_label.keys(),fontsize=11, title_fontsize=12,frameon=True) #loc="upper right"
+    legend.get_frame().set_facecolor("white")
+    legend.get_frame().set_alpha(0.7) #not supported with eps
+    #plt.show()
 
 def const_shift_data(channels,calibration_segments, calibration_segments_mean_correction,data_all_processed, find_nearest_date=find_nearest_date):
     """"""
