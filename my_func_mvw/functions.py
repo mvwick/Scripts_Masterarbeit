@@ -468,7 +468,7 @@ def const_shift_data(channels,calibration_segments, calibration_segments_mean_co
 
     return data_all_processed_constshifted
 
-def add_nan_val_in_datagaps(data_chan):
+def add_nan_val_in_datagaps(data_chan, minutes_gap=35):
     """biggest problem the searching for gaps is static.
     But when measurement sheme of dts device changes this is not valid.
     I do not plan to change this because I just need this function for nicer looking plots
@@ -478,7 +478,7 @@ def add_nan_val_in_datagaps(data_chan):
     
     index_datagaps=[]
     for i in range(len(diff)):
-        bo = diff[i] > timedelta(minutes=35)
+        bo = diff[i] > timedelta(minutes=minutes_gap)
         if bo == True:
             index_datagaps.append(i)
             #print(i)#;print(diff[i]) #i gibt einem die position des Datums ab welchem danach die Lücke ist
@@ -489,19 +489,19 @@ def add_nan_val_in_datagaps(data_chan):
         index_corrected = index + n_appended_values # the dataframe gets new values in other date gaps before this one
         # number of dates with nan, that will be added behin the index position
         # round down and minus 1 to be sure I dont add a nan behind an existing date - deleted this feature
-        n_nan_dates = math.floor(diff[index] / timedelta(minutes=32))
+        n_nan_dates = math.floor(diff[index] / timedelta(minutes=minutes_gap))
         n_appended_values += n_nan_dates
         list_nan = [np.nan] * n_nan_dates # list of nan
 
-        # add nan's in data gaps, by creating new datapoints with a timedifference of 3 min.
+        # add nan's in data gaps, by creating new datapoints with a timedifference of 32 min.
         # create dataframe which contains the dates and nan values
         #new_val = pd.DataFrame({data_chan.columns[0]: list_nan, df_Tlogger.columns[1]: list_nan}) #, df_Tlogger.columns[2]: list_nan}
         #new_val.index = [data_chan.index[index_corrected] + timedelta(minutes=x*35) for x in range(1,n_nan_dates+1)]
-        new_index = [data_chan_new.index[index_corrected] + timedelta(minutes=x*33) for x in range(1,n_nan_dates+1)]
+        new_index = [data_chan_new.index[index_corrected] + timedelta(minutes=x*minutes_gap) for x in range(1,n_nan_dates+1)]
         new_val=pd.DataFrame(index=new_index,columns=data_chan.columns)
         
 
-        # add nan values to Tlogger dataframe and sort it
+        # add nan values to dataframe and sort it
         data_chan_new = pd.concat([data_chan_new, new_val],axis=0).sort_index()
     print(f"{n_appended_values} dates with nan have been added")
 
@@ -510,14 +510,14 @@ def add_nan_val_in_datagaps(data_chan):
     # find data gaps
     diff = data_chan_new.index[1:] - data_chan_new.index[:-1]
     for i in range(len(diff)):
-        bo = diff[i] > timedelta(minutes=35)
+        bo = diff[i] > timedelta(minutes=minutes_gap)
         if bo == True:
             print("There are still some indexes missing:")
             print(i);print(diff[i]);print() #i gibt einem die position des Datums ab welchem danach die Lücke ist
     
     return data_chan_new
 
-def carpet_plot_with_gaps(data_input,channels,title_prefix="",sample_hours=3):
+def carpet_plot_with_gaps(data_input,channels,title_prefix="",sample_hours=3,add_nan_val_in_datagaps=add_nan_val_in_datagaps):
     """you shouldnt use sample_hours smaller than 1. Could cause unexpected behaviour."""
     # add nan values in gaps so the gaps appear in the plots
     data_all_processed_nan={}
