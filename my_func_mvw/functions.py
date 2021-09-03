@@ -517,7 +517,8 @@ def add_nan_val_in_datagaps(data_chan, minutes_gap=35):
     
     return data_chan_new
 
-def carpet_plot_with_gaps(data_input,channels,title_prefix="",sample_hours=3,add_nan_val_in_datagaps=add_nan_val_in_datagaps):
+def carpet_plot_with_gaps(data_input,channels,title_prefix="",sample_hours=3,add_nan_val_in_datagaps=add_nan_val_in_datagaps,
+                         vmin = 15, vmax = 35):
     """you shouldnt use sample_hours smaller than 1. Could cause unexpected behaviour."""
     # add nan values in gaps so the gaps appear in the plots
     data_all_processed_nan={}
@@ -546,10 +547,10 @@ def carpet_plot_with_gaps(data_input,channels,title_prefix="",sample_hours=3,add
         xstart = xax3[0]
         xstop  = xax3[-1]
 
-        axs[int(chan)-5].set_title(title_prefix + f'of Channel {chan}\nresampled to {sample_hours} hour data gaps', fontsize = 12)
+        axs[int(chan)-5].set_title(title_prefix + f'of Channel {chan}\nresampled to {sample_hours} hour', fontsize = 12)
         axs[int(chan)-5].grid(False) #axs[0,1].grid(color = '#10366f', alpha = 0.1)
         caxa = axs[int(chan)-5].imshow(data.transpose(), interpolation = 'gaussian', extent = [xstart, xstop, stopi, starti],
-                        cmap = 'viridis', aspect = 'auto', vmin = 15, vmax = 35) 
+                        cmap = 'viridis', aspect = 'auto', vmin = vmin, vmax = vmax) 
         axs[int(chan)-5].set_ylabel("Length [m]")
         axs[int(chan)-5].tick_params(axis="x", which='both',length=4,color="grey")
 
