@@ -6,7 +6,7 @@ import pandas as pd
 
 ############## PICKLE IMPORTER ######################
 
-def import_my_database_pickle(year, path_to_my_database_pickle):
+def import_my_database_pickle(year, path_to_my_database_pickle, controller=3188):
     """import script for pickle data of 2019+, imports each year seperate"""
     def read_pickle(filename:str):
         #Function to read pickle Files
@@ -26,14 +26,19 @@ def import_my_database_pickle(year, path_to_my_database_pickle):
     path_to_file={}
     data_20xx = {}
     if year == 2021: # all channels are activated since 01.06.2021
-        channels = [1,2,3,4,5,6,7,8]
+        if controller == 3188:
+            channels = [1,2,3,4,5,6,7,8]
+        elif controller == 3195:
+            channels = [1,2,3,4,5,6,8,9,10,11]
+
         for c in channels:
             importer_pickle(data_20xx, path_to_my_database_pickle, year, c)
 
-    if year == 2019 or 2020: # channels 5-8 are empty
-        channels = [1,2,3,4]
-        for c in channels:
-            importer_pickle(data_20xx, path_to_my_database_pickle, year, c)
+    if controller == 3188:
+        if year == 2019 or 2020: # channels 5-8 are empty
+            channels = [1,2,3,4]
+            for c in channels:
+                importer_pickle(data_20xx, path_to_my_database_pickle, year, c)
 
     return data_20xx
 

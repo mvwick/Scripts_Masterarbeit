@@ -24,13 +24,13 @@ def all_days_of_year(year, day_format="%Y-%m-%d"):
         current_day += oneday
     return output
 
-def calculate_measurements_per_day(dic,print_output=True):
+def calculate_measurements_per_day(dic,print_output=True, channels=[1,2,3,4,5,6,7,8]):
     """dic has to be the nested data dictionary
     returns dataframe with number pf unique days, depending on channelnumber and month
     """
     #create dataframe to save the number of unique days per month.
     #this means the number of days per month with at least one measurement
-    channels=[1,2,3,4,5,6,7,8]
+    #channels=[1,2,3,4,5,6,7,8]
     #months=[1,2,3,4,5,6,7,8,9,10,11,12]
 
     n_meas_pday=defaultdict(dict) # save number of measurements per day, depending on channel
@@ -52,7 +52,7 @@ def calculate_measurements_per_day(dic,print_output=True):
 
     return n_meas_pday
 
-def improve_n_meas_pday(n_meas_pday, year):
+def improve_n_meas_pday(n_meas_pday, year, channels=["1","2","3","4","5","6","7","8"]):
     """returns a dic, which also has days with 0 measurements
     
     Improve n_meas_pdy: add days where 0 measurements were made
@@ -61,8 +61,7 @@ def improve_n_meas_pday(n_meas_pday, year):
     used for output of calculate_measurements_per_day()
     """
     improved_n_meas_pday=defaultdict(dict)
-    channelnumbers=["1","2","3","4","5","6","7","8"]
-    for c in channelnumbers: # loop over each channel
+    for c in channels: # loop over each channel
         for day in all_days_of_year(year):
             if day in n_meas_pday[c].keys():
                 improved_n_meas_pday[c][day] = n_meas_pday[c][day]
