@@ -374,9 +374,9 @@ def calc_mean_for_each_segment(channels, calibration_segments, watertank_diff_lo
     
     return calibration_segments_mean_correction, calibration_segments_mean_correction_dates
 
-def plot_segments_mean_correction(calibration_segments_mean_correction,dates,calibration_segments_mean_correction_dates,watertank_diff_log_data_all,df_Tlogger_PT100,watertank_len,ymax=5, ymin=-15):
+def plot_segments_mean_correction(calibration_segments_mean_correction,dates,calibration_segments_mean_correction_dates,watertank_diff_log_data_all,df_Tlogger_PT100,watertank_len,ymax=5, ymin=-15, plot_width=16):
     """"""
-    fig,axs=plt.subplots(1,1,figsize=(16,5))
+    fig,axs=plt.subplots(1,1,figsize=(plot_width,5))
     # Plot border calibration segments
     plt.vlines(dates,ymin,ymax,colors="black",linestyle=":", label="correction segment borders")
 
