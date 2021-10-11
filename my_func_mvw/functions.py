@@ -41,70 +41,82 @@ def find_nearest_date(base_date_name,date_index, method_type="nearest"):
     return date_name, date_iloc
 
 
-def calc_diff_between_channels(data1,data2,find_nearest_date=find_nearest_date,expected_difference_minutes=13):
+def calc_diff_between_channels(data1,data2,find_nearest_date=find_nearest_date,expected_difference_minutes=13,suppress_print_output=False,method_type="nearest",diff_type_only_diff=True):
     """
     think of flipping one dataframe regarding length, because in avearaging channels one dataframe (channel 5 and 7) are flipped
     At the moment I flip outise of this function, if desired
     result: dic to store result dataframes in
     """
-    all_dates=[]
     result={}
-    df_diff=pd.DataFrame()
-    df_diff_re=pd.DataFrame()
-    df_diff_abs=pd.DataFrame()
-    df_diff_abs_re=pd.DataFrame()
+    date_names_chx_list=[]
+    diff_lists={}
+    if diff_type_only_diff==False:
+        for diff_type in ["diff_re","diff_abs","diff_re_abs","diff"]:
+            diff_lists[diff_type]=[]
+    elif diff_type_only_diff==True:
+        diff_lists["diff"]=[]
+
     # loop over all dates
     for i in range(1,len(data1.index)-1): #leave put first and last date
-        date_name_chy, date_iloc_chy = find_nearest_date(data1.index[i],data2.index)
+        date_name_chy, date_iloc_chy = find_nearest_date(data1.index[i],data2.index,method_type="nearest")
         date_name_chx = data1.index[i]
 
-        # check difference between the two dates
-        # not needed anymore, because its done at the beginning of the script now. But I will also keep it here
-        allowed_difference = timedelta(minutes=expected_difference_minutes)
-        time_diff = pd.to_datetime(date_name_chy) - date_name_chx
-        if time_diff > timedelta(minutes=0):
-            if time_diff > allowed_difference:
-                print("Warning 1: large time difference")
-                print(time_diff)
-        elif time_diff < timedelta(minutes=0):
-            if time_diff * -1 >  allowed_difference:
-                print("Warning 2: large time difference")
-                print(time_diff * -1)
-        else: #val=0
-            print("Something is wrong? No time diff between different channels!")
+        if suppress_print_output==False:
+            # check difference between the two dates
+            # not needed anymore, because its done at the beginning of the script now. But I will also keep it here
+            allowed_difference = timedelta(minutes=expected_difference_minutes)
+            time_diff = pd.to_datetime(date_name_chy) - date_name_chx
+            if time_diff > timedelta(minutes=0):
+                if time_diff > allowed_difference:
+                    print("Warning 1: large time difference")
+                    print(time_diff)
+            elif time_diff < timedelta(minutes=0):
+                if time_diff * -1 >  allowed_difference:
+                    print("Warning 2: large time difference")
+                    print(time_diff * -1)
+            else: #val=0
+                print("Something is wrong? No time diff between different channels!")
 
         # Calculate difference
+        # iloc faster?
         T_data1 = data1.loc[date_name_chx] #array with length as index, with all Temp. of the date
         T_data2 = data2.loc[date_name_chy]
         diff = T_data1 - T_data2#[::-1] #dont flip one here, i do it before puting the data into this function
-        diff_abs = abs(diff)
-        diff_re = diff/((T_data1+T_data2)/2) #ist das gut das so zu machen?
-        diff_re_abs = abs(diff/T_data1)
+        if diff_type_only_diff==False:
+            diff_abs = abs(diff)
+            diff_re = diff/((T_data1+T_data2)/2) #ist das gut das so zu machen?
+            diff_re_abs = abs(diff/T_data1)
 
         # save date in dataframe, date (columns name) is not the mean of both dates used
-        df_diff_re[date_name_chx] = diff_re
-        df_diff_abs[date_name_chx] = diff_abs
-        df_diff_abs_re[date_name_chx] = diff_re_abs
-        df_diff[date_name_chx] = diff
+        date_names_chx_list.append(date_name_chx)
+        diff_lists["diff"].append(diff.values)
+        if diff_type_only_diff==False:
+            diff_lists["diff_re"].append(diff_re.values)
+            diff_lists["diff_abs"].append(diff_abs.values)
+            diff_lists["diff_re_abs"].append(diff_re_abs.values)
+        
     
-    result["diff"]= df_diff
-    result["diff_abs"]= df_diff_abs
-    result["diff_re"]= df_diff_re 
-    result["diff_abs_re"]= df_diff_abs_re 
+    result["diff"]= pd.DataFrame(diff_lists["diff"],index=date_names_chx_list,columns=diff.index).transpose()
+    if diff_type_only_diff==False:
+        result["diff_abs"]= pd.DataFrame(diff_lists["diff_abs"],index=date_names_chx_list,columns=diff_abs.index).transpose()
+        result["diff_re"]= pd.DataFrame(diff_lists["diff_re"],index=date_names_chx_list,columns=diff_re.index).transpose()
+        result["diff_re_abs"]= pd.DataFrame(diff_lists["diff_re_abs"],index=date_names_chx_list,columns=diff_re_abs.index).transpose()
     return result
 
 
-def watertank_shift(dataframe, df_Tlogger, watertank_len, watertank_T_range_min, watertank_T_range_max, channels=["5","6","7","8"], find_nearest_date=find_nearest_date):
+def watertank_shift(dataframe, df_Tlogger, watertank_len, watertank_T_range_min, watertank_T_range_max, channels=["5","6","7","8"], find_nearest_date=find_nearest_date, time_diff_warning=5):
     """shift the data to the temperature of the watertank, at first watertank position"""
     val_watertank_ch={}
     diff_in_watertank={}
     corrected_val={} # dic for different channel, containing the dataframe of the corrected values
     watertank_diff_log={}
     for chan in channels:
-        df_c_v = pd.DataFrame(index=dataframe[chan].columns) # df for the corrected values
-        df_c_v.columns.name="Date"
+        c_v_list=[]
+        c_v_list_datenames=[]
+        df_c_v = pd.DataFrame(columns=dataframe[chan].columns) # df for the corrected values
+        df_c_v.index.name="Date"
 
-        df_watertank_diff_log=pd.DataFrame(index=[watertank_len[0]])
+        df_watertank_diff_log=pd.DataFrame(columns=[watertank_len[0]])
 
         # before always watertank position 0
         # want to test how much this influences the result, espeacially mean of channels
@@ -126,20 +138,26 @@ def watertank_shift(dataframe, df_Tlogger, watertank_len, watertank_T_range_min,
             # Temp of DTS cable at first watertank position
             val_watertank_ch[chan]=dataframe[chan].loc[str(date_name)][watertank_len[watertank_pos]]
             # Temp of watertank, measured by PT100
-            val_watertank=temp_watertank_func([date_name], df_Tlogger)[0]
+            val_watertank=temp_watertank_func([date_name], df_Tlogger, time_diff_warning=time_diff_warning)[0]
             # difference between PT100 and DTS at first watertank position
             # round values may be helpfull for reducing memory, 
             # decimal of 2 would be sufficient for the data accuaracy.
             diff_in_watertank[chan] = val_watertank_ch[chan] - val_watertank
-            df_watertank_diff_log[date_name] = diff_in_watertank[chan] # save the difference
+            #swapped index and columns compared t an older version
+            #df_watertank_diff_log[date_name] = diff_in_watertank[chan] # save the difference
+            df_watertank_diff_log=pd.concat([df_watertank_diff_log,pd.DataFrame(diff_in_watertank[chan],index=[date_name],columns=[watertank_len[0]])])
+
 
             # correct watertank diff; for all DTS points, based on first watertank position
             chan_val = np.array(dataframe[chan].loc[str(date_name)].values) # uncorrected DTS Temp
             # save corrected values in dataframe; c_v: corrected_value
-            df_c_v[date_name] = chan_val - diff_in_watertank[chan]
+            #df_c_v[date_name] = chan_val - diff_in_watertank[chan] # performance warning
+            #df_c_v.loc[date_name]=chan_val - diff_in_watertank[chan] # very slow: addind values row by row to a dataframe is slow!
+            c_v_list.append(chan_val - diff_in_watertank[chan])
+            c_v_list_datenames.append(date_name)
 
         # save corected values of the channel in dic
-        corrected_val[chan] = df_c_v.transpose() # same format as data_all
+        corrected_val[chan] = pd.DataFrame(c_v_list, columns=dataframe[chan].columns, index=c_v_list_datenames) # same format as data_all
         # save watertank difference of the channel
         watertank_diff_log[chan] = df_watertank_diff_log
     
@@ -154,7 +172,7 @@ def write_pickle(path,data):
     with open(path, 'wb') as handle:
         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-def temp_watertank_func(x, df_Tlogger, channel_name = "Channel1-PT100_rolling_mean"):
+def temp_watertank_func(x, df_Tlogger, channel_name = "Channel1-PT100_rolling_mean", time_diff_warning=5):
     """returns Temperature of Watertank at given time x, of the moving avearage values
     this is not really a matheamtical function, but I named it like this when I was using a polynomial function
 
@@ -171,11 +189,11 @@ def temp_watertank_func(x, df_Tlogger, channel_name = "Channel1-PT100_rolling_me
         # check timediff
         timediff = date - pd.to_datetime(date_name)
         if date > pd.to_datetime(date_name):
-            if timediff > timedelta(minutes=5):
-                print("Warning1 from temp_watertank_func: timediff larger than 5 minutes")
+            if timediff > timedelta(minutes=time_diff_warning):
+                print(f"Warning1 from temp_watertank_func: timediff larger than {time_diff_warning} minutes: {timediff} at requested date of: {date}")
         elif date < pd.to_datetime(date_name):
-            if -(timediff) > timedelta(minutes=5):
-                print("Warning2 from temp_watertank_func: timediff larger than 5 minutes")
+            if -(timediff) > timedelta(minutes=time_diff_warning):
+                print(f"Warning2 from temp_watertank_func: timediff larger than {time_diff_warning} minutes: {timediff} at requested date of: {date}")
 
 
     return temp
@@ -360,11 +378,11 @@ def calc_mean_for_each_segment(channels, calibration_segments, watertank_diff_lo
         for segment in calibration_segments:
             start_date=segment[0]
             end_date=segment[1]
-            chan_dates = watertank_diff_log_data_all[chan].loc[watertank_len[0]].index
+            chan_dates = watertank_diff_log_data_all[chan][watertank_len[0]].index
             date_name_start, date_iloc_start = find_nearest_date(start_date,chan_dates)
             date_name_end, date_iloc_end = find_nearest_date(end_date,chan_dates)
 
-            data = watertank_diff_log_data_all[chan].loc[watertank_len[0]]
+            data = watertank_diff_log_data_all[chan][watertank_len[0]]
             #leave out measurement close to border
             segment_mean = np.nanmean(data[date_iloc_start+5:date_iloc_end-5])
             segment_mean_list.append(segment_mean)
@@ -385,7 +403,7 @@ def plot_segments_mean_correction(calibration_segments_mean_correction,dates,cal
         segment_number=0
         for segment_mean in calibration_segments_mean_correction[chan]:
             date_border = calibration_segments_mean_correction_dates[chan][segment_number]
-            x=watertank_diff_log_data_all[chan].columns[date_border[0]:date_border[1]]
+            x=watertank_diff_log_data_all[chan].index[date_border[0]:date_border[1]]
             if x.size != 0: # some segments can be empty for some channels (channel 5 and 6 data gap EGRT)
                 start = x[0]
                 end = x[-1]
@@ -397,8 +415,8 @@ def plot_segments_mean_correction(calibration_segments_mean_correction,dates,cal
                 axs.hlines(segment_mean, start, end, color="black", linestyle="--", label="mean correction")
             segment_number+=1
 
-        x=watertank_diff_log_data_all[chan].columns
-        y=watertank_diff_log_data_all[chan].loc[watertank_len[0]]
+        x=watertank_diff_log_data_all[chan].index
+        y=watertank_diff_log_data_all[chan][watertank_len[0]]
         axs.plot(x,y,label=f"correction for channel {chan}")
 
     # plot watertank Temp for comparisson
@@ -417,8 +435,6 @@ def plot_segments_mean_correction(calibration_segments_mean_correction,dates,cal
     #     axs.plot([x[0],x[-1]],[y.mean(),y.mean()],color="black",linestyle="--")
     #     plt.plot(x,y,label=f"Correction for avearagefirst: {chan}")
 
-    axs.set_title("Analyse Water Tank Correction", fontsize=13)
-    axs.set_xlabel("Date")
     axs.set_ylabel("Temperature [°C]")
     axs.set_ylim(ymin,ymax)
     # get labels for legend to remove duplicates
@@ -431,23 +447,24 @@ def plot_segments_mean_correction(calibration_segments_mean_correction,dates,cal
     legend.get_frame().set_alpha(0.7) #not supported with eps
     #plt.show()
 
-def const_shift_data(channels,calibration_segments, calibration_segments_mean_correction,data_all_processed, find_nearest_date=find_nearest_date):
+def const_shift_data(channels,calibration_segments, calibration_segments_mean_correction,data_all_processed, find_nearest_date=find_nearest_date,round_x=1):
     """"""
     data_all_processed_constshifted = {}
     for chan in channels:
         data_all_processed_constshifted_parts = defaultdict(dict)
         for i_segment in range(len(calibration_segments_mean_correction[chan])):
             #date = calibration_segments_mean_correction_dates[chan][i_segment] # dates where the mean was calculated with
-            
+
             # date border of segment
             date_begin = calibration_segments[i_segment][0]
             date_end = calibration_segments[i_segment][1]
             # date border of segment for this channel
-            date_begin_chan, date_begin_chan_iloc = find_nearest_date(date_begin, data_all_processed[chan].index, method_type="bfill")
+            # exact match is always used, independent of method_type
+            date_begin_chan, date_begin_chan_iloc = find_nearest_date(date_begin, data_all_processed[chan].index, method_type="bfill") #bfill
             date_end_chan, date_end_chan_iloc = find_nearest_date(date_end, data_all_processed[chan].index, method_type="ffill")
 
             # Correct data
-            raw_data_segment = data_all_processed[chan][date_begin_chan_iloc : date_end_chan_iloc]
+            raw_data_segment = data_all_processed[chan][date_begin_chan_iloc : date_end_chan_iloc + 1]
             mean_correction_segment = calibration_segments_mean_correction[chan][i_segment]
             # if i_segment == 1: #EGRT Segment
             #     # not much watertank measurements and they are not good for coorrecting
@@ -464,7 +481,7 @@ def const_shift_data(channels,calibration_segments, calibration_segments_mean_co
         for i_segment in list(data_all_processed_constshifted_parts[chan].keys())[1:]:
             final_dataframe = pd.concat([final_dataframe, data_all_processed_constshifted_parts[chan][i_segment]])
 
-        data_all_processed_constshifted[chan] = round(final_dataframe,1)
+        data_all_processed_constshifted[chan] = round(final_dataframe,round_x)
 
     return data_all_processed_constshifted
 
@@ -567,3 +584,15 @@ def carpet_plot_with_gaps(data_input,channels,title_prefix="",sample_hours=3,add
     axs[3].xaxis_date()
     date_format = mdates.DateFormatter('%Y-%m-%d')
     axs[3].xaxis.set_major_formatter(date_format)
+
+def save_values_in_file(file_line, name, value, path_to_file):
+    """saves a value in a txt file, can then be read with latex
+    the fileline is overwritten and must exists"""
+    with open(path_to_file, 'r') as file:
+        # read a list of lines into data
+        values_for_read_in_tex = file.readlines()
+
+    values_for_read_in_tex[file_line] = f"{name} = {value} \n"
+
+    with open(path_to_file, 'w') as file:
+        file.writelines(values_for_read_in_tex)
