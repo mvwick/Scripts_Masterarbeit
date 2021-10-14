@@ -30,6 +30,7 @@ def plot_frequency_spectrum(xf, yf, vlines, vlines_labels, ylim=[0,200]):
     vlines_colors=["green","red","pruple","orange"]
     # 1 day fluctutation:
     T_day=24*60*60
+    f_12h=1/(T_day/2)
     f_day=1/T_day
     f_week=1/(T_day*7)
     f_month=1/(T_day*30)
@@ -42,6 +43,7 @@ def plot_frequency_spectrum(xf, yf, vlines, vlines_labels, ylim=[0,200]):
     else:
         plt.plot(xf,np.abs(yf), label="fourier transform")
 
+    plt.vlines([f_12h],ylim[0],ylim[1],color="black",linestyle="dashdot",zorder=10,linewidth=3, alpha=0.3, label="half-day variations: 1/12 $h^{-1}$")
     plt.vlines([f_day],ylim[0],ylim[1],color="black",zorder=10,linewidth=3, alpha=0.3, label="daily variations: 1/24 $h^{-1}$")
     plt.vlines([f_week],ylim[0],ylim[1],color="black",linestyle="--",linewidth=3,zorder=10, alpha=0.3, label="weekly variations: 1/7 $d^{-1}$")
     plt.vlines([f_month],ylim[0],ylim[1],color="black",linestyle=":",linewidth=3,zorder=10, alpha=0.3, label="monthly variations: 1/4 $w^{-1}$")

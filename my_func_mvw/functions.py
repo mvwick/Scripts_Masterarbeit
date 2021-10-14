@@ -13,6 +13,11 @@ import matplotlib.patches as patches
 from collections import defaultdict
 import math
 from copy import deepcopy
+import plotly
+import plotly.express as px
+import kaleido
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 def get_abspath(basepath):
     """Get the files you need to import into your script with Path
@@ -417,7 +422,11 @@ def plot_segments_mean_correction(calibration_segments_mean_correction,dates,cal
 
         x=watertank_diff_log_data_all[chan].index
         y=watertank_diff_log_data_all[chan][watertank_len[0]]
-        axs.plot(x,y,label=f"correction for channel {chan}")
+        if chan in ["5and6","7and8"]:
+            chan_legend=f"{chan[0]} {chan[1:4]} {chan[4]}"
+        else:
+            chan_legend=chan
+        axs.plot(x,y,label=f"correction for channel {chan_legend}")
 
     # plot watertank Temp for comparisson
     name="Channel1-PT100_rolling_mean"
@@ -550,8 +559,8 @@ def carpet_plot_with_gaps(data_input,channels,title_prefix="",sample_hours=3,add
     #    just_for_test[chan]=data_all_processed_nan[chan].resample("3H").ffill()
     #my_Warning = check_processed_data(channels=["5","6","7","8"], data_all_processed = just_for_test,gap_begin=0,gap_end=0)
 
-    fig,axs=plt.subplots(4,1,figsize=(16,22))
-
+    fig,axs=plt.subplots(len(channels),1,figsize=(16,len(channels)*5))
+    ax_num=0
     for chan in channels:
         data=data_all_processed_nan[chan].resample(f"{sample_hours}H").ffill()
         print(f"Number of dates in Channel {chan}: {len(data.index)}")
@@ -564,26 +573,38 @@ def carpet_plot_with_gaps(data_input,channels,title_prefix="",sample_hours=3,add
         xstart = xax3[0]
         xstop  = xax3[-1]
 
-        axs[int(chan)-5].set_title(title_prefix + f'of Channel {chan}\nresampled to {sample_hours} hour', fontsize = 12)
-        axs[int(chan)-5].grid(False) #axs[0,1].grid(color = '#10366f', alpha = 0.1)
-        caxa = axs[int(chan)-5].imshow(data.transpose(), interpolation = 'gaussian', extent = [xstart, xstop, stopi, starti],
+        if chan in ["5and6","7and8"]:
+            title_chan=f"{chan[0]} {chan[1:4]} {chan[4]}"
+        else:
+            title_chan=chan
+        axs[ax_num].set_title(title_prefix + f'of channel {title_chan}', fontsize = 12) #\nresampled to {sample_hours} hour
+        axs[ax_num].grid(False) #axs[0,1].grid(color = '#10366f', alpha = 0.1)
+        caxa = axs[ax_num].imshow(data.transpose(), interpolation = 'gaussian', extent = [xstart, xstop, stopi, starti],
                         cmap = 'viridis', aspect = 'auto', vmin = vmin, vmax = vmax) 
-        axs[int(chan)-5].set_ylabel("Length [m]")
-        axs[int(chan)-5].tick_params(axis="x", which='both',length=4,color="grey")
-
+        axs[ax_num].set_ylabel("Length [m]")
+        axs[ax_num].tick_params(axis="x", which='both',length=4,color="grey")
+        ax_num+=1
 
     cbax = fig.add_axes([0.92, 0.15, 0.015, 0.7])
     cbar = fig.colorbar(caxa, cax = cbax, orientation = 'vertical', fraction = 0.05, pad = - 0.05)
     cbar.set_label('Temperature [°C]', rotation = 0, fontsize = 9, labelpad = -20,  y = 1.03)
 
-    axs[0].sharex(axs[3])
-    axs[1].sharex(axs[3])
-    axs[2].sharex(axs[3])
+    if channels == ["5and6","7and8"]:
+        axs[0].sharex(axs[1])
+        axs[1].tick_params(axis = 'x', labelrotation = 0)
+        axs[1].xaxis_date()
+        date_format = mdates.DateFormatter('%Y-%m-%d')
+        axs[1].xaxis.set_major_formatter(date_format)
 
-    axs[3].tick_params(axis = 'x', labelrotation = 0)
-    axs[3].xaxis_date()
-    date_format = mdates.DateFormatter('%Y-%m-%d')
-    axs[3].xaxis.set_major_formatter(date_format)
+    else:
+        axs[0].sharex(axs[3])
+        axs[1].sharex(axs[3])
+        axs[2].sharex(axs[3])
+
+        axs[3].tick_params(axis = 'x', labelrotation = 0)
+        axs[3].xaxis_date()
+        date_format = mdates.DateFormatter('%Y-%m-%d')
+        axs[3].xaxis.set_major_formatter(date_format)
 
 def save_values_in_file(file_line, name, value, path_to_file):
     """saves a value in a txt file, can then be read with latex
@@ -596,3 +617,146 @@ def save_values_in_file(file_line, name, value, path_to_file):
 
     with open(path_to_file, 'w') as file:
         file.writelines(values_for_read_in_tex)
+
+def statistic_plot(data_shaft,date_min_max=[61650,62200],c="1",temp_ax_min=22, temp_ax_max=26, sample_hours = 1):
+    """Copied / Inspired by Daniels plot"""
+    header_fontsize=12
+    legend_font=10
+    shaft_nan_chan = data_shaft[c][date_min_max[0]:date_min_max[1]]
+    shaft_nan_chan = add_nan_val_in_datagaps(shaft_nan_chan)
+
+    data_down=shaft_nan_chan.resample(f"{sample_hours}H").mean()#ffill()
+
+    depth = data_down.columns
+    # for every depth minimum along all dates
+
+    tempmin = data_down.min(axis = 0)
+    tempmax = data_down.max(axis = 0)
+    tempmean = data_down.mean(axis = 0)
+    tempstd = data_down.std(axis = 0)
+
+    fig , axs=plt.subplots(2,2,figsize=[14,7]) #, sharey = True #,constrained_layout=True
+    # Make one axes out of two subplots
+    gs = axs[1, 0].get_gridspec()
+    fig.delaxes(axs[0,0])
+    fig.delaxes(axs[1,0])
+    big_axs = fig.add_subplot(gs[:, 0])
+
+    # 1. Axes
+    big_axs.set_title('Statistic Temperature Over Time', fontsize = header_fontsize)
+    big_axs.plot(tempmean, depth, color='#10366f', alpha = 0.8, label = 'mean')
+    big_axs.fill_betweenx(depth, tempmin, tempmax,
+                    #facecolor="blue",           # The fill color
+                    color='#7fc7ff',             # The outline color
+                    alpha=0.3, label = 'min - max') # Transparency of the fill
+    big_axs.fill_betweenx(depth, tempmean - tempstd, tempmean + tempstd,
+                    # facecolor="#1CB992",       # The fill color
+                    color="#c52b2f",             # The outline color
+                    alpha=0.3, label = 'standart deviation') # Transparency of the fill
+
+    big_axs.set_ylim([(depth.max() + 0.05 * (depth.max()-depth.min())), 
+                    (depth.min() - 0.05 * (depth.max() - depth.min()))])
+    
+    big_axs.set_ylabel("Depth [m]",fontsize=legend_font)
+    big_axs.set_xlabel("Temperature [°C]",fontsize=legend_font)
+    big_axs.set_xlim(temp_ax_min,temp_ax_max)
+    big_axs.set_ylim(depth[-1],depth[0])
+    legend = big_axs.legend(fontsize=11, title_fontsize=11,frameon=True)
+    legend.get_frame().set_facecolor("white")
+    legend.get_frame().set_alpha(0.7) #not supported with eps
+
+    # 2. Axes
+    date = data_down.index.to_series()
+    # Datum-Ticks auf x-Achse und Farbskala
+    starti = depth[0]
+    stopi = depth[-1]
+    xax3 = mdates.date2num(date)
+    xstart = xax3[0]
+    xstop  = xax3[-1]
+
+    axs[0,1].set_title('Temperature in Shaft', fontsize = header_fontsize)
+    axs[0,1].tick_params(axis = 'x', labelrotation = 30, labelcolor = 'w')
+    axs[0,1].grid(False) #axs[0,1].grid(color = '#10366f', alpha = 0.1)
+    caxa = axs[0,1].imshow(data_down.transpose(), interpolation = 'gaussian', extent = [xstart, xstop, stopi, starti],
+                    vmin = temp_ax_min, vmax = temp_ax_max, cmap = 'viridis', aspect = 'auto')
+    cbax = fig.add_axes([0.92, 0.5, 0.015, 0.38])
+    cbar = fig.colorbar(caxa, cax = cbax, orientation = 'vertical', fraction = 0.05, pad = - 0.05)
+    cbar.set_label('Temp [°C]', rotation = 0, fontsize = 9, labelpad = -20,  y = 1.08)
+    axs[0,1].set_ylabel("Depth [m]",fontsize=legend_font)
+    #axs[0,1].sharey(big_axs)
+
+    # 3. Axes
+    axs[1,1].set_title('Mean Temperature in Shaft', fontsize = header_fontsize)
+    axs[1,1].set_ylabel('Temperature [°C]',fontsize=legend_font)
+    axs[1,1].tick_params(axis = 'x', labelrotation = 30)
+    axs[1,1].set_ylim(temp_ax_min, temp_ax_max)
+    axs[1,1].plot(data_down.mean(axis = 1), color = '#10366f', alpha = 0.9, label = 'DTS-Temperatur')
+    axs[1,1].sharex(axs[0,1])
+    axs[1,1].xaxis_date()
+    date_format = mdates.DateFormatter('%Y-%m-%d')
+    axs[1,1].xaxis.set_major_formatter(date_format)
+
+    axs[1,1].tick_params(axis="x", which='both',length=4,color="grey")
+    axs[0,1].tick_params(axis="x", which='both',length=4,color="grey")
+
+def plot_water_rise(data,plot_save,linear_curve=[163,0.008],zminmax=[21,25],title="",data_type="chan14"):
+    """linear_curve: [start_depth, m]"""
+    #data plot
+    trace1=go.Heatmap(
+        x=data.index,
+        y=data.columns,
+        z=data.transpose(),
+        name=f"Temperature {title}",
+        yaxis='y',zmin=zminmax[0],zmax=zminmax[1],colorbar={"title":f"Temp. [°C]"}
+        )#,zmin=20,zmax=24,labels={"color":"Temp. °C"}) #,cmap={"title":"Dept]"}
+
+    #Linear fit
+    datetonum=mdates.date2num(data.index)#[:-300]
+    m=linear_curve[1] #[m / datetonum pixel]
+    timediff=data.index[0] - data.index[-1]
+    years=abs(timediff.days /365.25) #years in measurement time
+    m_measurement_time=m*len(datetonum)
+    m_year=m_measurement_time/years #[m / a]
+    start_depth=linear_curve[0]
+    ground_water_depth_fit=start_depth-m*(datetonum-datetonum[0])
+
+    #linear fit plot
+    trace2 = go.Scatter(
+        x=data.index,
+        y=ground_water_depth_fit, #np.ones(len(data.index))*150
+        name='line fit',
+        yaxis='y',
+        fillcolor="blue",
+        line={"color":"blue","dash":"dash","width":3},
+        )
+    #horizontal line as reference
+    trace3 = go.Scatter(
+        x=data.index,
+        y=np.ones(len(data.index))*linear_curve[0], #
+        name='line horizontal',
+        yaxis='y',
+        fillcolor="black",
+        line={"color":"green","dash":"dot","width":3},
+        )
+
+    fig = make_subplots(specs=[[{"secondary_y": False}]])
+    fig.add_trace(trace1)
+    fig.add_trace(trace2,secondary_y=False)
+    fig.add_trace(trace3,secondary_y=False)
+    fig.update_layout(yaxis = {"autorange":"reversed","title":"Depth [m]"},showlegend=False)
+
+    if plot_save:
+        if title=="Diff." and data_type=="chan14":
+            filename=f"\\carpet_ch14_shaft_water_rise_diff.pdf"
+        elif title=="" and data_type=="chan14":
+            filename=f"\\carpet_ch14_shaft_water_rise.pdf"
+        elif title=="Diff." and data_type=="chan58":
+            filename=f"\\carpet_ch58_shaft_water_rise_diff.pdf"
+        elif title=="" and data_type=="chan58":
+            filename=f"\\carpet_ch58_shaft_water_rise.pdf"
+        fig.write_image(r"..\Masterthesis_tex\figs\chap4" + filename,width=1120, height=500)
+    
+    fig.show()
+
+    print(f"fitted water level rise: {round(m_year,1)} m / year") #global sea level rise 1900 to 2017: 1.4–1.8 mm per year
+    print(f"this is a total of {round(m_measurement_time,1)} m in the measurement time")
