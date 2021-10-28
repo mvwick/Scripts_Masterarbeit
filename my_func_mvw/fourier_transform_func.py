@@ -15,7 +15,12 @@ def resample_data_func(data,resample_hours=5):
     Duration=(data_resample.index.max()-data_resample.index.min()).total_seconds()
     N_samples=sampling_rate * Duration
 
-    return data_resample, sampling_time
+    # Calc Nyquist frequency
+    abtast_frequency=1/sampling_time #[Hz] #=sampling_rate
+    #all frequncies of signal have to be smaller than nyquist frequncy, otherwise alliasing
+    nyquist_frequency=0.5*abtast_frequency
+
+    return data_resample, sampling_time, nyquist_frequency
 
 def fourier_transform(data_resample, sampling_time):
     """"""
@@ -25,7 +30,7 @@ def fourier_transform(data_resample, sampling_time):
 
     return yf, xf
 
-def plot_frequency_spectrum(xf, yf, vlines, vlines_labels, ylim=[0,200]):
+def plot_frequency_spectrum(xf, yf, vlines, vlines_labels,nyquist_frequency, ylim=[0,40]):
     """"""
     vlines_colors=["green","red","pruple","orange"]
     # 1 day fluctutation:
@@ -47,12 +52,14 @@ def plot_frequency_spectrum(xf, yf, vlines, vlines_labels, ylim=[0,200]):
     plt.vlines([f_day],ylim[0],ylim[1],color="black",zorder=10,linewidth=3, alpha=0.3, label="daily variations: 1/24 $h^{-1}$")
     plt.vlines([f_week],ylim[0],ylim[1],color="black",linestyle="--",linewidth=3,zorder=10, alpha=0.3, label="weekly variations: 1/7 $d^{-1}$")
     plt.vlines([f_month],ylim[0],ylim[1],color="black",linestyle=":",linewidth=3,zorder=10, alpha=0.3, label="monthly variations: 1/4 $w^{-1}$")
+    plt.vlines([nyquist_frequency],ylim[0],ylim[1],color="black",linestyle="solid",linewidth=1,zorder=1, alpha=1, label="Nyquist frequency")
+    
     label_counter=0
     for vline in vlines:
         plt.vlines(vline,ylim[0],ylim[1],zorder=10, alpha=0.5, label=vlines_labels[label_counter], color=vlines_colors[label_counter])
         label_counter+=1
     plt.xlabel("Frequency [Hz]")
-    plt.ylabel("Absolute Amplitute [°C]")
+    plt.ylabel("Absolute Amplitute [K]")
     plt.ylim(ylim)
     plt.xlim(left=0)
     #plt.title("Frequency Spectrum")

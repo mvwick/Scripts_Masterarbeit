@@ -63,7 +63,7 @@ def calc_diff_between_channels(data1,data2,find_nearest_date=find_nearest_date,e
 
     # loop over all dates
     for i in range(1,len(data1.index)-1): #leave put first and last date
-        date_name_chy, date_iloc_chy = find_nearest_date(data1.index[i],data2.index,method_type="nearest")
+        date_name_chy, date_iloc_chy = find_nearest_date(data1.index[i],data2.index,method_type=method_type)
         date_name_chx = data1.index[i]
 
         if suppress_print_output==False:
@@ -699,23 +699,34 @@ def statistic_plot(data_shaft,date_min_max=[61650,62200],c="1",temp_ax_min=22, t
     axs[1,1].tick_params(axis="x", which='both',length=4,color="grey")
     axs[0,1].tick_params(axis="x", which='both',length=4,color="grey")
 
-def plot_water_rise(data,plot_save,linear_curve=[163,0.008],zminmax=[21,25],title="",data_type="chan14"):
+def plot_water_rise(data,plot_save,linear_curve=[163,0.008],zminmax=[22,24],title="",data_type="chan14"):
     """linear_curve: [start_depth, m]"""
     #data plot
-    trace1=go.Heatmap(
-        x=data.index,
-        y=data.columns,
-        z=data.transpose(),
-        name=f"Temperature {title}",
-        yaxis='y',zmin=zminmax[0],zmax=zminmax[1],colorbar={"title":f"Temp. [°C]"}
-        )#,zmin=20,zmax=24,labels={"color":"Temp. °C"}) #,cmap={"title":"Dept]"}
+    if title=="Diff.":
+        trace1=go.Heatmap(
+            x=data.index,
+            y=data.columns,
+            z=data.transpose(),
+            name=f"Temperature {title}",
+            yaxis='y',zmin=zminmax[0],zmax=zminmax[1],colorbar={"title":f"Temp. [°C]"},
+            colorscale='gray',reversescale=True
+            )#,zmin=20,zmax=24,labels={"color":"Temp. °C"}) #,cmap={"title":"Dept]"}
+    else:
+        trace1=go.Heatmap(
+            x=data.index,
+            y=data.columns,
+            z=data.transpose(),
+            name=f"Temperature {title}",
+            yaxis='y',zmin=zminmax[0],zmax=zminmax[1],colorbar={"title":f"Temp. [°C]"},
+            colorscale='thermal'
+            )#,zmin=20,zmax=24,labels={"color":"Temp. °C"}) #,cmap={"title":"Dept]"}
 
     #Linear fit
     datetonum=mdates.date2num(data.index)#[:-300]
     m=linear_curve[1] #[m / datetonum pixel]
     timediff=data.index[0] - data.index[-1]
     years=abs(timediff.days /365.25) #years in measurement time
-    m_measurement_time=m*len(datetonum)
+    m_measurement_time=m*(datetonum[-1]-datetonum[0]) #[m / complete_time]
     m_year=m_measurement_time/years #[m / a]
     start_depth=linear_curve[0]
     ground_water_depth_fit=start_depth-m*(datetonum-datetonum[0])
@@ -738,6 +749,13 @@ def plot_water_rise(data,plot_save,linear_curve=[163,0.008],zminmax=[21,25],titl
         fillcolor="black",
         line={"color":"green","dash":"dot","width":3},
         )
+    #Quadratic fit
+    a=-0.008
+    h=20000
+    k=140
+    x=datetonum-datetonum[0]
+    ground_water_depth_fit_quadratic=a*(x-h)**2+k
+    start_depth-m*(datetonum-datetonum[0])
 
     fig = make_subplots(specs=[[{"secondary_y": False}]])
     fig.add_trace(trace1)
