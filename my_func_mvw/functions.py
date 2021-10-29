@@ -255,10 +255,20 @@ def cut_dataframe_to_range_tlogger(channels, data, watertank_T_range_min, watert
     date_iloc_max = min(date_iloc_max_list)
     date_iloc_min = max(date_iloc_min_list)
     # drop the dates which are not covered by t-logger
-    for chan in channels:
-        data_processed[chan] = data[chan].drop(data[chan].index[0:date_iloc_min],axis=0)
-        new_max_index = date_iloc_max - date_iloc_min # I already dropped some values, therefore the index changed
-        data_processed[chan] = data_processed[chan].drop(data_processed[chan].index[new_max_index:],axis=0)
+    if channels == ["5and6","7and8"] or channels == ["7and8","5and6"]:
+        # cut is different for each channel
+        counter_chan=0
+        for chan in channels:
+            data_processed[chan] = data[chan].drop(data[chan].index[0:date_iloc_min_list[counter_chan]],axis=0)
+            new_max_index = date_iloc_max_list[counter_chan] - date_iloc_min_list[counter_chan] # I already dropped some values, therefore the index changed
+            data_processed[chan] = data_processed[chan].drop(data_processed[chan].index[new_max_index:],axis=0)
+            counter_chan+=1
+    else:
+        # cut is the same for all channels
+        for chan in channels:
+            data_processed[chan] = data[chan].drop(data[chan].index[0:date_iloc_min],axis=0)
+            new_max_index = date_iloc_max - date_iloc_min # I already dropped some values, therefore the index changed
+            data_processed[chan] = data_processed[chan].drop(data_processed[chan].index[new_max_index:],axis=0)
     
     if do_check:
         check_first_last_date(data_processed, channels=channels)
@@ -778,3 +788,13 @@ def plot_water_rise(data,plot_save,linear_curve=[163,0.008],zminmax=[22,24],titl
 
     print(f"fitted water level rise: {round(m_year,1)} m / year") #global sea level rise 1900 to 2017: 1.4–1.8 mm per year
     print(f"this is a total of {round(m_measurement_time,1)} m in the measurement time")
+
+def create_mask_egrt(dataframe,start_date_string="13.07.2021",end_date_string="23.07.2021",find_nearest_date=find_nearest_date):
+    """create mask which contains True if not a EGRT date"""
+    date_name_start,date_iloc_start=find_nearest_date(pd.to_datetime(start_date_string,dayfirst=True),dataframe.index)
+    date_name_end,date_iloc_end=find_nearest_date(pd.to_datetime(end_date_string,dayfirst=True),dataframe.index)
+    egrt_dates=dataframe.index[date_iloc_start:date_iloc_end]
+
+    mask_not_egrt=[False if x in egrt_dates else True for x in dataframe.index]
+    return mask_not_egrt
+
