@@ -436,7 +436,7 @@ def plot_segments_mean_correction(calibration_segments_mean_correction,dates,cal
             chan_legend=f"{chan[0]} {chan[1:4]} {chan[4]}"
         else:
             chan_legend=chan
-        axs.plot(x,y,label=f"correction for channel {chan_legend}")
+        axs.plot(x,y,label=f"correction for mean of channels {chan_legend}")
 
     # plot watertank Temp for comparisson
     name="Channel1-PT100_rolling_mean"
@@ -797,4 +797,68 @@ def create_mask_egrt(dataframe,start_date_string="13.07.2021",end_date_string="2
 
     mask_not_egrt=[False if x in egrt_dates else True for x in dataframe.index]
     return mask_not_egrt
+
+
+def diff_to_watertank(data_calc, watertank_len, watertank_T_range_min,watertank_T_range_max,df_Tlogger_PT100,find_nearest_date = find_nearest_date,shorten_input_date=False):
+    """Calculate differences of corrected values to watertank
+    alle variables I need and defined before are as default inputs
+
+    pos: Temp von DTS höher als in Wassertank
+    neg: Temp von DTS niedriger als in Wassertank
+    """
+
+    diff_watertank_aftercorr_alldates={}
+    data_calc_shorten={} #so not the inout data is changed
+    for chan in data_calc.keys():
+        # df for watertank diffs of corrected values
+        #diff_watertank_aftercorr = pd.DataFrame(index=watertank_len)
+        diff_dic_lists={}
+        date_name_dic_lists={}
+        diff_dic_lists[chan]=[]
+        date_name_dic_lists[chan]=[]
+
+        if shorten_input_date:
+            # find the date range of this channel, which also is covered by the T-Logger
+            # Im prinzip unnötig, da corrected value eh komplett gecoverde sind von T-logger
+            date_name_min, date_iloc_min = find_nearest_date(watertank_T_range_min,data_calc[chan].index,method_type="bfill")
+            date_name_max, date_iloc_max = find_nearest_date(watertank_T_range_max,data_calc[chan].index,method_type="ffill")
+            #all_dates_in_range_channel   = data_calc[chan].index[date_iloc_min:date_iloc_max]           
+            data_calc_shorten[chan]=data_calc[chan][date_iloc_min:date_iloc_max]
+        else:
+            data_calc_shorten[chan]=data_calc[chan]
+            
+        for date_name in data_calc_shorten[chan].index:
+            #date_numeric=mdates.date2num(date_name)# create numeric of date for calculations
+            val_watertank=temp_watertank_func([date_name], df_Tlogger_PT100)[0]  # T of watertank, measured by PT-sensor
+            # when using constshift dates which are not in watertank_func range become nan because rolling mean is nan
+ 
+            if chan in ["5","6"] or chan in["5and6"]:
+                # corrected values of DTS at watertank positions
+                c_v_watertank0 = data_calc_shorten[chan][watertank_len[0]][date_name] # c_v: corrected value
+                c_v_watertank1 = data_calc_shorten[chan][watertank_len[1]][date_name]
+                diffs = [c_v_watertank0 - val_watertank, c_v_watertank1 - val_watertank, np.nan, np.nan]
+                
+
+            elif chan in ["7","8"] or chan in ["7and8"]: 
+                # these channels are longer and contain the last two watertank positions
+                # corrected values of DTS at watertank positions
+                c_v_watertank0 = data_calc_shorten[chan][watertank_len[0]][date_name] # c_v: corrected value
+                c_v_watertank1 = data_calc_shorten[chan][watertank_len[1]][date_name]
+                c_v_watertank2 = data_calc_shorten[chan][watertank_len[2]][date_name]
+                c_v_watertank3 = data_calc_shorten[chan][watertank_len[3]][date_name]
+                # differences
+                diffs = [c_v_watertank0 - val_watertank, c_v_watertank1 - val_watertank, c_v_watertank2 - val_watertank, c_v_watertank3 - val_watertank]
+            
+            elif chan in ["1","2","3","4"]:
+                c_v_watertank0 = data_calc_shorten[chan][watertank_len[0]][date_name] # c_v: corrected value
+                diffs=[c_v_watertank0 - val_watertank]
+            
+            diff_dic_lists[chan].append(diffs)
+            date_name_dic_lists[chan].append(date_name)
+            #diff_watertank_aftercorr[date_name] = diffs
+
+        # save diffs to other watertank positions of this channel in dic
+        diff_watertank_aftercorr_alldates[chan] = pd.DataFrame(diff_dic_lists[chan],index=date_name_dic_lists[chan],columns=watertank_len).transpose()
+    
+    return diff_watertank_aftercorr_alldates
 
