@@ -709,7 +709,7 @@ def statistic_plot(data_shaft,date_min_max=[61650,62200],c="1",temp_ax_min=22, t
     axs[1,1].tick_params(axis="x", which='both',length=4,color="grey")
     axs[0,1].tick_params(axis="x", which='both',length=4,color="grey")
 
-def plot_water_rise(data,plot_save,linear_curve=[163,0.008],zminmax=[22,24],title="",data_type="chan14"):
+def plot_water_rise(data,plot_save,linear_curve=[163,0.008],zminmax=[22,24],title="",data_type="chan14",show_additional_water_level_info=True):
     """linear_curve: [start_depth, m]"""
     #data plot
     if title=="Diff.":
@@ -759,6 +759,20 @@ def plot_water_rise(data,plot_save,linear_curve=[163,0.008],zminmax=[22,24],titl
         fillcolor="black",
         line={"color":"green","dash":"dot","width":3},
         )
+    #points with water level information from other sources
+    if show_additional_water_level_info:
+        date_2020_wireline=pd.to_datetime("2020-11-24 12:00:00")
+        water_level_wireline2020=158.5
+        trace4 = go.Scatter(
+            x=[date_2020_wireline],
+            y=[water_level_wireline2020],
+            name='additional water level info',
+            yaxis='y',
+            # fillcolor="black",
+            mode="markers",
+            marker={"color":"blue","size":15}
+            )
+
     #Quadratic fit
     a=-0.008
     h=20000
@@ -771,6 +785,8 @@ def plot_water_rise(data,plot_save,linear_curve=[163,0.008],zminmax=[22,24],titl
     fig.add_trace(trace1)
     fig.add_trace(trace2,secondary_y=False)
     fig.add_trace(trace3,secondary_y=False)
+    if show_additional_water_level_info:
+        fig.add_trace(trace4,secondary_y=False)
     fig.update_layout(yaxis = {"autorange":"reversed","title":"Depth [m]"},showlegend=False)
 
     if plot_save:
@@ -790,12 +806,25 @@ def plot_water_rise(data,plot_save,linear_curve=[163,0.008],zminmax=[22,24],titl
     print(f"this is a total of {round(m_measurement_time,1)} m in the measurement time")
 
 def create_mask_egrt(dataframe,start_date_string="13.07.2021",end_date_string="23.07.2021",find_nearest_date=find_nearest_date):
-    """create mask which contains True if not a EGRT date"""
-    date_name_start,date_iloc_start=find_nearest_date(pd.to_datetime(start_date_string,dayfirst=True),dataframe.index)
-    date_name_end,date_iloc_end=find_nearest_date(pd.to_datetime(end_date_string,dayfirst=True),dataframe.index)
+    """create mask which contains True if not a EGRT date.
+    Can also be used to create other masks.
+    
+    Date strings are converted with dayfirst=True"""
+    if type(start_date_string) == str:
+        date_start=pd.to_datetime(start_date_string,dayfirst=True)
+        date_end  =pd.to_datetime(end_date_string,dayfirst=True)
+    else:
+        date_start=start_date_string
+        date_end  =end_date_string
+
+    date_name_start,date_iloc_start=find_nearest_date(date_start,dataframe.index)
+    date_name_end,date_iloc_end=find_nearest_date(date_end,dataframe.index)
     egrt_dates=dataframe.index[date_iloc_start:date_iloc_end]
 
     mask_not_egrt=[False if x in egrt_dates else True for x in dataframe.index]
+
+    # flipping the list
+    mask_egrt=[not elem for elem in mask_not_egrt]
     return mask_not_egrt
 
 
