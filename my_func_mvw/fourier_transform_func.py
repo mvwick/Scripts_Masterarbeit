@@ -24,6 +24,9 @@ def resample_data_func(data,resample_hours=5):
 
 def fourier_transform(data_resample, sampling_time):
     """"""
+    # shifting the values of data_resample to a mean of zero only affects the lowest frequency
+    # so it seems to not be very important that the signals mean is 0
+
     # Fourier transformation
     yf=rfft(data_resample.values) 
     xf=rfftfreq(len(data_resample.index),sampling_time)

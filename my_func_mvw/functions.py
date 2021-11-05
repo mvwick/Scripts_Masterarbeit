@@ -587,7 +587,11 @@ def carpet_plot_with_gaps(data_input,channels,title_prefix="",sample_hours=3,add
             title_chan=f"{chan[0]} {chan[1:4]} {chan[4]}"
         else:
             title_chan=chan
-        axs[ax_num].set_title(title_prefix + f'of channel {title_chan}', fontsize = 12) #\nresampled to {sample_hours} hour
+        if title_prefix=="":
+            channel_string="Channel"
+        else:
+            channel_string="channel"
+        axs[ax_num].set_title(title_prefix  + f'{channel_string} {title_chan}', fontsize = 12,loc="left") #\nresampled to {sample_hours} hour
         axs[ax_num].grid(False) #axs[0,1].grid(color = '#10366f', alpha = 0.1)
         caxa = axs[ax_num].imshow(data.transpose(), interpolation = 'gaussian', extent = [xstart, xstop, stopi, starti],
                         cmap = 'viridis', aspect = 'auto', vmin = vmin, vmax = vmax) 
