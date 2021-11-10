@@ -722,7 +722,7 @@ def plot_water_rise(data,plot_save,linear_curve=[163,0.008],zminmax=[22,24],titl
             y=data.columns,
             z=data.transpose(),
             name=f"Temperature {title}",
-            yaxis='y',zmin=zminmax[0],zmax=zminmax[1],colorbar={"title":f"Temp. [°C]"},
+            yaxis='y',zmin=zminmax[0],zmax=zminmax[1],colorbar={"title":f"Temp. [K]"},
             colorscale='gray',reversescale=True
             )#,zmin=20,zmax=24,labels={"color":"Temp. °C"}) #,cmap={"title":"Dept]"}
     else:
@@ -777,13 +777,13 @@ def plot_water_rise(data,plot_save,linear_curve=[163,0.008],zminmax=[22,24],titl
             marker={"color":"blue","size":15}
             )
 
-    #Quadratic fit
-    a=-0.008
-    h=20000
-    k=140
-    x=datetonum-datetonum[0]
-    ground_water_depth_fit_quadratic=a*(x-h)**2+k
-    start_depth-m*(datetonum-datetonum[0])
+    # # Quadratic fit - not used
+    # a=-0.008
+    # h=20000
+    # k=140
+    # x=datetonum-datetonum[0]
+    # ground_water_depth_fit_quadratic=a*(x-h)**2+k
+    # start_depth-m*(datetonum-datetonum[0])
 
     fig = make_subplots(specs=[[{"secondary_y": False}]])
     fig.add_trace(trace1)
