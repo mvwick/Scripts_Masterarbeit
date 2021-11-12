@@ -154,7 +154,7 @@ def plot_fourier_carpet(data,channel,plot_save=False,zmin=0,zmax=20):
         y=data.columns,
         z=data.transpose(),
         name=f"Fourier Amplitude",
-        yaxis='y',zmin=zmin,zmax=zmax,colorbar={"title":f"Amplitude [K]"},)
+        yaxis='y',zmin=zmin,zmax=zmax,colorbar={"title":f"Amp. [K]"},)
 
     #frequency lines as reference
     T_day=24*60*60
