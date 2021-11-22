@@ -795,14 +795,15 @@ def plot_water_rise(data,plot_save,linear_curve=[163,0.008],zminmax=[22,24],titl
 
     if plot_save:
         if title=="Diff." and data_type=="chan14":
-            filename=f"\\carpet_ch14_shaft_water_rise_diff.pdf"
+            filename=f"\\carpet_ch14_shaft_water_rise_diff"
         elif title=="" and data_type=="chan14":
-            filename=f"\\carpet_ch14_shaft_water_rise.pdf"
+            filename=f"\\carpet_ch14_shaft_water_rise"
         elif title=="Diff." and data_type=="chan58":
-            filename=f"\\carpet_ch58_shaft_water_rise_diff.pdf"
+            filename=f"\\carpet_ch58_shaft_water_rise_diff"
         elif title=="" and data_type=="chan58":
-            filename=f"\\carpet_ch58_shaft_water_rise.pdf"
-        fig.write_image(r"..\Masterthesis_tex\figs\chap4" + filename,width=1120, height=500)
+            filename=f"\\carpet_ch58_shaft_water_rise"
+        fig.write_image(r"..\Masterthesis_tex\figs\chap4" + filename + ".pdf",width=1120, height=500)
+        fig.write_image(r"..\Masterthesis_tex\figs_raster\chap4" + filename + ".png",width=1120, height=500)
     
     fig.show()
 

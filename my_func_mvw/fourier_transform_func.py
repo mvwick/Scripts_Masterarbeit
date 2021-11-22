@@ -250,14 +250,16 @@ def plot_fourier_carpet(data,channel,plot_save=False,zmin=0,zmax=20):
         if channel in ["7and8","mean_all"]:
             if channel=="7and8":
                 data_type=78
-                filename=f"\\fourier_carpet_ch{data_type}.pdf"
+                filename=f"\\fourier_carpet_ch{data_type}"
             elif channel=="mean_all":
                 data_type=14
-                filename=f"\\fourier_carpet_ch{data_type}.pdf"
-            fig.write_image(r"..\Masterthesis_tex\figs\chap4" + filename,width=1120, height=500)
+                filename=f"\\fourier_carpet_ch{data_type}"
+            fig.write_image(r"..\Masterthesis_tex\figs\chap4" + filename + ".pdf",width=1120, height=500)
+            fig.write_image(r"..\Masterthesis_tex\figs_raster\chap4" + filename + ".png",width=1120, height=500)
         elif channel == "5and6":
             data_type=56
-            filename=f"\\fourier_carpet_ch{data_type}.pdf"
-            fig.write_image(r"..\Masterthesis_tex\appendix" + filename,width=1120, height=500)
+            filename=f"\\fourier_carpet_ch{data_type}"
+            fig.write_image(r"..\Masterthesis_tex\appendix" + filename + ".pdf",width=1120, height=500)
+            fig.write_image(r"..\Masterthesis_tex\appendix_raster" + filename + ".png",width=1120, height=500)
 
     fig.show()
