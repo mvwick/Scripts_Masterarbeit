@@ -137,7 +137,6 @@ def import_my_database_2018_csv(path_to_my_database_2018_csv):
 
     return data_2018
 
-
 def merge_data_year(list_data_years):
     """input the different year dics as a list
     Merge the different year dics into one

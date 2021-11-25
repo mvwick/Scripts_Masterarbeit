@@ -896,3 +896,37 @@ def diff_to_watertank(data_calc, watertank_len, watertank_T_range_min,watertank_
     
     return diff_watertank_aftercorr_alldates
 
+def calc_mean_channels_n_pday(n_meas_pday_20xx_with0, channels, check_dates_equal=True):
+    """calculate the number of measurements as mean over the 4 channels
+    check_dates_equal=True only works for Alsdorf data at the moment
+    """
+    val={}
+    date={}
+    for channel in channels:
+        val[channel]=np.array(list(n_meas_pday_20xx_with0[channel].values()))
+        date[channel]=pd.to_datetime(list(n_meas_pday_20xx_with0["1"]))
+
+    #mean measurements per day
+    summe=val[channels[0]]
+    for channel in channels[1:]:
+        summe=summe + val[channel]
+    mean=summe/len(channels)
+
+    # # check if dates are equal
+    if check_dates_equal:
+        counter_equal=0
+        counter_not_equal=0
+        for i in range(len(date["1"])):
+            if date["1"][i] == date["2"][i] and date["3"][i] and date["4"][i] and date["5"][i] and date["6"][i] and date["7"][i] and date["8"][i]:
+                #print("all dates for mean calculation are equal")
+                counter_equal+=1
+        else:
+            #print("dates for mean calculation are not equal!")
+            #print(date_ch1[i]);print(date_ch2[i]);print(date_ch3[i]);print(date_ch4[i])
+            counter_not_equal+=1
+        if counter_not_equal >= 3: # 31.12. seems to be a problem? Dont know why. Not very important.
+            print("check dates")
+
+    #all dates are equal, so I can just return one date
+    return mean, date["1"]
+
