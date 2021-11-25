@@ -1,3 +1,5 @@
+::WILL SOON BE NOT NEEDED ANYMORE!!!!
+
 :: this script uploads my_database to sciebo and adds the newest version of my script to the my_databse repository
 
 :: copy scripts from my scripts folder to my_database folder, also copy outsourced functions
