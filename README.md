@@ -17,7 +17,7 @@ In the following are explained some workflows, which aim to facilitate the begin
 ## Where to start? It is the first time I am here. 
 1. Get the data, the data is saved separately on sciebo, not public. Without the data you can not run any of the scripts. Go to the sciebo repository `sciebo\DTS Data` and download it, this script repository is included there.
 2. `my_database_script.ipynb` gives a first overview and should be the first notebook you run. It can be run with the default libraries of Anaconda.
-3. Set up environment: Install plotly and kaleido, all other libraries are part of Anaconda by default. If you need a more detailed explanation see [Set up python environment](###Set-up-python-environment)
+3. Set up environment: Install plotly and kaleido, all other libraries are part of Anaconda by default. If you need a more detailed explanation see [Set up python environment](#set-up-python-environment)
 4. You now have a first overview of the data and should be able to run all scripts.
 
 ### Set up python environment
