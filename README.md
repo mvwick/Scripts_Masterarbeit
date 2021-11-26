@@ -15,15 +15,19 @@ I am the only one using this at the moment anyway, so it doesnt matter.
 In the following are explained some workflows, which aim to facilitate the begin of the work with the GGE-DTS.
 
 ## Where to start? It is the first time I am here. 
-1. Get the data, the data is saved separately on sciebo, not public. Without the data you can not run any of the scripts. Go to the sciebo repository `sciebo\DTS Data` and download it, this script repository is included there.
-2. `my_database_script.ipynb` gives a first overview and should be the first notebook you run. It can be run with the default libraries of Anaconda.
-3. Set up environment: Install plotly and kaleido, all other libraries are part of Anaconda by default. If you need a more detailed explanation see [Set up python environment](#set-up-python-environment)
+1. Get the data; the data is saved separately on sciebo, not public. Without the data you can not run any of the scripts. Go to the sciebo repository `sciebo\DTS Data` and download it, this script repository is included there.
+2. `my_database_script.ipynb` gives a first overview and should be the first notebook you run.
+3. Set up environment: Install plotly and kaleido, all other used libraries are part of Anaconda by default. If you need a more detailed explanation see [Set up python environment](#set-up-python-environment).
 4. You now have a first overview of the data and should be able to run all scripts.
 
 ### Set up python environment
-I use [Anaconda](https://www.anaconda.com/products/individual) as package manager. In some scripts I use libraries which are not installed by default in Anaconda. I will explain one option how you can install all libraries get the scripts to run. By the way I am (usually) a windows guy.
-1. If you are new to python install [Anaconda](https://www.anaconda.com/products/individual), if not you wont need this explanations anyway.
-2. You can use a editor from Anaconda, personally I use a different one: [VSCode](https://code.visualstudio.com/). VSCode is an editor for everything, you need to install extensions for different file types. Install the following ones: Jupyter, Pylance and Python.
+If you are familier with python you dont need this section.
+I will explain one option how you can install all libraries and get the scripts to run.
+By the way I am (usually) a windows guy.
+I use [Anaconda](https://www.anaconda.com/products/individual) as package manager.
+In some scripts, I use libraries which are not installed by default in Anaconda.
+1. If you are new to python install [Anaconda](https://www.anaconda.com/products/individual).
+2. You can use an editor from Anaconda, personally I use a different one: [VSCode](https://code.visualstudio.com/). VSCode is an editor for everything, you need to install extensions for different file types. Install the following ones: Jupyter, Pylance and Python.
 3. Open the anaconda prompt (found in Anaconda Navigator or Search) and install the following libraries, they are not by default installed from Anaconda.
 ````
 conda install -c plotly plotly
@@ -32,7 +36,7 @@ conda install -c conda-forge python-kaleido
 4. You are now equipped for executing all scripts.
 
 ## Install Charon4 and import all available data
-You will need about 15 minutes to import all data.
+You will need about 10 minutes to import all data.
 1. Install a standard Charon4 version on you working PC, e.g. `sciebo\DTS Data\Miscellaneous\Charon_Software\Charon4_2_39_Support`. You could also use Charon3 but 3 and 4 are not compatible with each other. Currently the download from the devices is done with Charon4, this would have to be changed first, if you want to use Charon3.
 2. alt + shift + F3 to enter User Level 3, which has more rights. Username and password are given in chapter Login Charon from `sciebo\DTS Data\Log-In_DTS_devices_software.docx` I recommend using the *keep me logged in* option.
 3. Import the already existing data (`.mex4`) into Charon4. Click on *Charon Symbol* in top left corner then *Import* and import `sciebo/DTS Data/Alsdorf/Daten/unprocessed/mex_backup/all_data_until_04112021.mex4`. This imports 8 files because the data has been split among them.
@@ -40,9 +44,13 @@ You will need about 15 minutes to import all data.
 5. Now import the data from the EONERC. Go to `sciebo\DTS Data\EONERC\Data\unprocessed\mex_backup` and import all `.mex4` files. When the import is finished your Charon4 now contains all available data from EONERC.
 
 ## I want to add new DTS data to the database
-1. First you should take a look at *where to start?*, if you are here the first time.
-2. You should consider installing Charon4 on you working PC and import all available data first, take a look at *Install Charon4 and import all available data*. My workflow is to export the data from the measurement site as `.mex4`. I then import these files in my "personal" Charon4 installation. Then I export them in a readable format and process the data with the scripts. This workflow is described in the following.
-3. Export the data from the device at the measurement site as `.mex4` using Charon4.
+First you should take a look at *where to start?*, if you are here the first time.
+Additionally, you should consider [installing Charon4 and import all available data](#install-charon4-and-import-all-available-data) on you working PC.
+My workflow is to export the data from the measurement site as `.mex4`.
+I then import these files in my "personal" Charon4 installation.
+Then I export them in a readable format and process the data with the scripts.
+This workflow is described in the following.
+1. Export the data from the device at the measurement site as `.mex4` using Charon4.
     1. Open Charon4 if not already open, if you are not logged in as Service user: press alt + shift + F3, username and password are given in `sciebo\DTS Data\Log-In_DTS_devices_software.docx`
         * You could start a data download from the device to the PC: *Service*, *Data Download* the process can be seen in the property window usually at the bottom left.
         * With the current settings the data is downloaded and deleted on the DTS device automatically, so manually downloading it is not needed
@@ -50,18 +58,17 @@ You will need about 15 minutes to import all data.
     2. Click on the controller number you want to export from, it needs to be selected for the next step.
     3. top left corner *Charon Symbol*, *Export*, *Measurement Data (.mex4)*
     4. New window opens: Choose the exported time range, use a range which overlaps with the before exported data time range, so no data ist forgotten. Duplicates are not imported by Charon.
-4. Import this file to the "personal" Charon4 installation: top left corner *Charon Symbol*, *Import*
-5. Export the data in a readable format (.txt)
+2. Import this file to the "personal" Charon4 installation: top left corner *Charon Symbol*, *Import*
+3. Export the data in a readable format (`.txt`)
     1. Click on the controller number you want to export from, it needs to be selected.
     2. top left corner *Charon Symbol*, *Export*, *Measurement Data (.txt)*
     3. New window opens: select the time range you want to export, use a range which overlaps with the before exported data time range, the scripts in this repository will filter duplicates.
-    4. Path: Create a new folder in `sciebo\DTS Data\Alsdorf\Daten\unprocessed\Charon4\charon4_export_as_txt` and ad the path from the new folder.
+    4. *Path*: Create a new folder in `sciebo\DTS Data\Alsdorf\Daten\unprocessed\Charon4\charon4_export_as_txt` and add the path from the new folder.
     5. For all other settings use the same as given in `charon4_txt_to_python.ipynb`.
-6. Add the path to the controller of the `.txt` repository to `charon4_txt_to_python.ipynb`, adapt the inputs for the used device (3195 or 3188).
+4. Add the path to the controller of the `.txt` repository to `charon4_txt_to_python.ipynb`, adapt the inputs for the used device (3195 or 3188).
 5. Run `charon4_txt_to_python.ipynb`, this takes a few minutes.
 6. Run the process scripts
 7. The new data is now saved. You should now run the analyse scripts to incorporate the newer data in the plots.
-
 
 ## I want to add new reference temperature data (TLogger) to the database - Currently only in Alsdorf
 Currently the logging device is not working in a stand alone mode. It needs to have a permanent connection to the PC, otherwise the logging stops and needs to be started manually again. **Add how to set up TLogger Lete**
