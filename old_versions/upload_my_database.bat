@@ -1,4 +1,5 @@
-::WILL SOON BE NOT NEEDED ANYMORE!!!!
+:: Old script, which I used to copy data to the sciebo repositoy
+:: I keep it in old_versions because its my first .bat script, maybe I come back here to look things up
 
 :: this script uploads my_database to sciebo and adds the newest version of my script to the my_databse repository
 
