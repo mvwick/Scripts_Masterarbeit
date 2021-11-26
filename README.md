@@ -11,8 +11,9 @@ Currently I dont follow this, I work directly on the sciebo repository.
 Maybe as a maintainer you are allowed to break your own rules.
 I am the only one using this at the moment anyway, so it doesnt matter.
 
-
-## where to start? It is the first time I am here. 
+# How To ...
+In the following are explained some workflows, which aim to facilitate the begin of the work with the GGE-DTS.
+## Where to start? It is the first time I am here. 
 1. Get the data, the data is saved separately on sciebo, not public. Without the data you can not run any of the scripts. Go to the sciebo repository `sciebo\DTS Data` and download it, this script repository is included there.
 2. `my_database_script.ipynb` gives a first overview and should be the first notebook you run. It can be run with the default libraries of Anaconda.
 3. Set up environment: Install all libraries which are needed for the other scripts and not by default part of Anaconda.
