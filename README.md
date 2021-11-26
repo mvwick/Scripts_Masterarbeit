@@ -13,20 +13,31 @@ I am the only one using this at the moment anyway, so it doesnt matter.
 
 # How To ...
 In the following are explained some workflows, which aim to facilitate the begin of the work with the GGE-DTS.
+
 ## Where to start? It is the first time I am here. 
 1. Get the data, the data is saved separately on sciebo, not public. Without the data you can not run any of the scripts. Go to the sciebo repository `sciebo\DTS Data` and download it, this script repository is included there.
 2. `my_database_script.ipynb` gives a first overview and should be the first notebook you run. It can be run with the default libraries of Anaconda.
-3. Set up environment: Install all libraries which are needed for the other scripts and not by default part of Anaconda.
-**TO DO: link tutorial/explanation here**
+3. Set up environment: Install plotly and kaleido, all other libraries are part of Anaconda by default. If you need a more detailed explanation see [Set up python environment](###Set-up-python-environment)
 4. You now have a first overview of the data and should be able to run all scripts.
+
+### Set up python environment
+I use [Anaconda](https://www.anaconda.com/products/individual) as package manager. In some scripts I use libraries which are not installed by default in Anaconda. I will explain one option how you can install all libraries get the scripts to run. By the way I am (usually) a windows guy.
+1. If you are new to python install [Anaconda](https://www.anaconda.com/products/individual), if not you wont need this explanations anyway.
+2. You can use a editor from Anaconda, personally I use a different one: [VSCode](https://code.visualstudio.com/). VSCode is an editor for everything, you need to install extensions for different file types. Install the following ones: Jupyter, Pylance and Python.
+3. Open the anaconda prompt (found in Anaconda Navigator or Search) and install the following libraries, they are not by default installed from Anaconda.
+````
+conda install -c plotly plotly
+conda install -c conda-forge python-kaleido
+````
+4. You are now equipped for executing all scripts.
 
 ## Install Charon4 and import all available data
 You will need about 15 minutes to import all data.
 1. Install a standard Charon4 version on you working PC, e.g. `sciebo\DTS Data\Miscellaneous\Charon_Software\Charon4_2_39_Support`. You could also use Charon3 but 3 and 4 are not compatible with each other. Currently the download from the devices is done with Charon4, this would have to be changed first, if you want to use Charon3.
 2. alt + shift + F3 to enter User Level 3, which has more rights. Username and password are given in chapter Login Charon from `sciebo\DTS Data\Log-In_DTS_devices_software.docx` I recommend using the *keep me logged in* option.
-3. Import the already existing data (`.mex4`) into Charon4. Click on *Charon Symbol* in top left corner then *Import* and import `sciebo/DTS Data/Alsdorf/Daten/unprocessed/mex_backup/laptop_all_split/laptop_all_20210708.mex4`, this is all the data from the old laptop in Alsdorf, which has been replaced by a new PC.
-4. Import all other `.mex4` files from `sciebo/DTS Data/Alsdorf/Daten/unprocessed/mex_backup`, if the import is finished your Charon4 now contains all available data from Alsdorf.
-5. Now import the data from the EONERC. Got to `sciebo\DTS Data\EONERC\Data\unprocessed\mex_backup` and import all `.mex4` files. When the import is finished your Charon4 now contains all available data from EONERC.
+3. Import the already existing data (`.mex4`) into Charon4. Click on *Charon Symbol* in top left corner then *Import* and import `sciebo/DTS Data/Alsdorf/Daten/unprocessed/mex_backup/all_data_until_04112021.mex4`. This imports 8 files because the data has been split among them.
+4. Import all other `.mex4` files from `sciebo/DTS Data/Alsdorf/Daten/unprocessed/mex_backup`. When you finished your Charon4 now contains all available data from Alsdorf.
+5. Now import the data from the EONERC. Go to `sciebo\DTS Data\EONERC\Data\unprocessed\mex_backup` and import all `.mex4` files. When the import is finished your Charon4 now contains all available data from EONERC.
 
 ## I want to add new DTS data to the database
 1. First you should take a look at *where to start?*, if you are here the first time.
