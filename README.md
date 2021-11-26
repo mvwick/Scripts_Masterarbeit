@@ -71,7 +71,8 @@ This workflow is described in the following.
 7. The new data is now saved. You should now run the analyse scripts to incorporate the newer data in the plots.
 
 ## I want to add new reference temperature data (TLogger) to the database - Currently only in Alsdorf
-Currently the logging device is not working in a stand alone mode. It needs to have a permanent connection to the PC, otherwise the logging stops and needs to be started manually again. **Add how to set up TLogger Lete**
+Currently the logging device needs a permanent connection to the PC, otherwise the logging stops and needs to be started manually again.
+If you want to change the settings maybe this notes are off help: [I want to set up or change settings of the Lete TLogger](#i-want-to-set-up-or-change-settings-of-the-Lete-TLogger)
 1. The Lete Logging software should be open on the measurement PC.
     * If the software is not open, then no data is logged, with the current settings.
 2. Go to the Lete data save folder and extract `kanal_1.txt` and `kanal_2.txt` from the data folder.
@@ -80,6 +81,24 @@ Currently the logging device is not working in a stand alone mode. It needs to h
 4. Add the path to `kanal_1.txt` to `tlogger_to_python.ipynb` and run the script.
 5. New reference temperature measurements are now saved. You should now run the process and analyse scripts to incorporate the newer data in the plots.
 
-
 ## I want to set up or change settings of the Lete TLogger
-Here I will write my experiences with the TLogger.
+You should definitely take a look at the manuals: `sciebo\DTS Data\Miscellaneous\T_logger_lete_software`
+Lothar installed the hardware.
+I did not manage to set up a stable CF-Card use: *Extras* *Speicher Karte*.
+I noticed short connection interruptions, which stop the logging or reset the date labelling.
+Therefore, the data is at the moment directly saved on the PC.
+The downside is that the logger needs to be connected to the turned on PC all the time.
+1. Follow the installation description in 5 Softwareinstallation of `sciebo\DTS Data\Miscellaneous\T_logger_lete_software\LE-LOG_1623_USB_TE_SP.pdf`
+    * I did not need to add the driver manually
+2. Got *Formel Editor* and select for each channel the logging type.
+3. If the shown value is not in the expected range maybe change the mode to *Berechnung im Controller* or *Berechnung im PC*
+4. Deactivate all unused channels: *Kanal deaktivieren*
+5. Choose the logging time per channel in *Zeit (ms)*
+6. Tick *Logger an/aus*; The logging should work now, the data is saved in the `data` folder of the Lete repository.
+<!-- Here are som notes on how to use the logger in remote mode (Speicher Karte). Currently this mode is not used.
+How-to-export data:
+Fenster für Speicherkarte öffnen; update drücken; download /read file starten; im pop up Fenster auf öffnen drücken von _daten;
+alles aus dem Ordner kopieren; manchmal klappt konvertieren nicht direkt?; 
+Man kann im Fenster der Speicherkarte unten rechts auf konvertieren klicken, dann wird ein neuer file abgespeichert der ein einfacheres Format hat (adc...);
+Dann auf init, so wird die Speicherkarte gelöscht; Danach läuft alles normal weiter -->
+
