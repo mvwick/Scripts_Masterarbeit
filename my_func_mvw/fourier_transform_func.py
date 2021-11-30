@@ -43,10 +43,10 @@ def fourier_transform(data_resample, sampling_time, return_abs=False):
     return yf, xf
 
 def plot_frequency_spectrum(xf, yf, vlines, vlines_labels,nyquist_frequency, ylim=[0,40]):
-    """"""
+    """x is expected to be in Hz"""
     vlines_colors=["green","red","pruple","orange"]
     # 1 day fluctutation:
-    T_day=24*60*60
+    T_day=24*60*60*10**(-6) #mikro seconds
     f_12h=1/(T_day/2)
     f_day=1/T_day
     f_week=1/(T_day*7)
@@ -54,23 +54,24 @@ def plot_frequency_spectrum(xf, yf, vlines, vlines_labels,nyquist_frequency, yli
 
     plt.figure(figsize=(16,4))
 
+    # *10**6 convert xf to mikro Hz
     if type(xf)==dict:
         for channel in xf.keys():
-            plt.plot(xf[channel],np.abs(yf[channel]), label=f"fourier transform channel {channel}")
+            plt.plot(xf[channel]*10**6,np.abs(yf[channel]), label=f"fourier transform channel {channel}")
     else:
-        plt.plot(xf,np.abs(yf), label="fourier transform")
+        plt.plot(xf*10**6,np.abs(yf), label="fourier transform")
 
     plt.vlines([f_12h],ylim[0],ylim[1],color="black",linestyle="dashdot",zorder=10,linewidth=3, alpha=0.3, label="half-day variations: 1/12 $h^{-1}$")
     plt.vlines([f_day],ylim[0],ylim[1],color="black",zorder=10,linewidth=3, alpha=0.3, label="daily variations: 1/24 $h^{-1}$")
     plt.vlines([f_week],ylim[0],ylim[1],color="black",linestyle="--",linewidth=3,zorder=10, alpha=0.3, label="weekly variations: 1/7 $d^{-1}$")
     plt.vlines([f_month],ylim[0],ylim[1],color="black",linestyle=":",linewidth=3,zorder=10, alpha=0.3, label="monthly variations: 1/4 $w^{-1}$")
-    plt.vlines([nyquist_frequency],ylim[0],ylim[1],color="black",linestyle="solid",linewidth=1,zorder=1, alpha=1, label="Nyquist frequency")
+    plt.vlines([nyquist_frequency*10**6],ylim[0],ylim[1],color="black",linestyle="solid",linewidth=1,zorder=1, alpha=1, label="Nyquist frequency")
     
     label_counter=0
     for vline in vlines:
         plt.vlines(vline,ylim[0],ylim[1],zorder=10, alpha=0.5, label=vlines_labels[label_counter], color=vlines_colors[label_counter])
         label_counter+=1
-    plt.xlabel("Frequency [Hz]")
+    plt.xlabel("Frequency [\u03BCHz]")
     plt.ylabel("Absolute Amplitute [K]")
     plt.ylim(ylim)
     plt.xlim(left=0)
@@ -242,7 +243,7 @@ def plot_fourier_carpet(data,channel,plot_save=False,zmin=0,zmax=20):
         y0=y0_2,y1=y1_2,#does not work with pdf save
         )#monthly
 
-    fig.update_layout(yaxis = {"title":"Length [m]"},xaxis={"title":"Frequency [\u03BCHZ]"},
+    fig.update_layout(yaxis = {"title":"Length [m]"},xaxis={"title":"Frequency [\u03BCHz]"},
                         legend={"x":0.005,"y":0.85,"traceorder":"normal","font":{"size":11,"color":"black"},"orientation":"h","xanchor":"left","yanchor":"bottom"},showlegend=True)
     fig.update_yaxes(range=[data.columns[-1], 0], row=1, col=1)
 
