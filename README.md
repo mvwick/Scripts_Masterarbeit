@@ -36,6 +36,7 @@ conda install -c conda-forge python-kaleido
 4. You are now equipped for executing all scripts.
 
 ## Install Charon4 and import all available data
+Some of my experiences with Charon are summarized in [Charon_tips_and_tricks]().
 You will need about 10 minutes to import all data.
 1. Install a standard Charon4 version on you working PC, e.g. `sciebo\DTS Data\Miscellaneous\Charon_Software\Charon4_2_39_Support`. You could also use Charon3 but 3 and 4 are not compatible with each other. Currently the download from the devices is done with Charon4, this would have to be changed first, if you want to use Charon3.
 2. alt + shift + F3 to enter User Level 3, which has more rights. Username and password are given in chapter Login Charon from `sciebo\DTS Data\Log-In_DTS_devices_software.docx` I recommend using the *keep me logged in* option.
