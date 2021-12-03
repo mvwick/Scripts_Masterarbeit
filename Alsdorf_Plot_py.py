@@ -39,10 +39,10 @@ ch8 = ["temp_ch8_2021.csv"]
 
 
 img = "Ch4.png"
-path_to_my_database = r"..\Alsdorf\Daten\my_database" #added by mathis
+path_DTS_processed = r"..\Alsdorf\Daten\DTS_processed" #added by mathis
 dff = []
 for i in ch4: #ch1 ch2 ch3 ch4 ch5 ch6 ch7 ch8
-    df = pd.read_csv(path_to_my_database + "\\csv\\" + i,delimiter = ',',index_col=0, header=0 )
+    df = pd.read_csv(path_DTS_processed + "\\csv\\" + i,delimiter = ',',index_col=0, header=0 )
     dff.append(df)
 dfa = pd.concat(dff, axis=0)
 print(dfa)

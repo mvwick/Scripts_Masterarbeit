@@ -148,7 +148,7 @@ def calc_fourier_carpet_data(data_input,channels=["5and6","7and8"],drop_egrt_dat
     
     return df_yf
 
-def plot_fourier_carpet(data,channel,plot_save=False,zmin=0,zmax=20):
+def plot_fourier_carpet(data,channel,mastertheseis_save=False,zmin=0,zmax=20):
     """put in the result of calc_fourier_carpet_data()"""
     trace1=go.Heatmap(
         x=data.index,
@@ -183,14 +183,14 @@ def plot_fourier_carpet(data,channel,plot_save=False,zmin=0,zmax=20):
     # y0 y1 does not work with pdf save ...
     # seems to be a bug: y positions are measured from 0 to 1 in graph during save,
     # in normal plot they are measures at y axis
-    if plot_save==False:
+    if mastertheseis_save==False:
         if channel=="5and6":
             y0_0=0;y1_0=500;y0_1=1200;y1_1=1800;wekkly_anno_pos=200
         elif channel=="7and8":
             y0_0=0;y1_0=500;y0_1=1200;y1_1=2200;y0_2=2920;y1_2=3700;wekkly_anno_pos=200
         elif channel in ["1","2","3","4","mean_all"]:
             y0_0=0;y1_0=180;wekkly_anno_pos=0.9
-    elif plot_save==True:
+    elif mastertheseis_save==True:
         if channel=="5and6":
             y0_0=0.72;y1_0=1;y0_1=0;y1_1=0.28;  wekkly_anno_pos=0.9
         elif channel=="7and8":
@@ -247,7 +247,7 @@ def plot_fourier_carpet(data,channel,plot_save=False,zmin=0,zmax=20):
                         legend={"x":0.005,"y":0.85,"traceorder":"normal","font":{"size":11,"color":"black"},"orientation":"h","xanchor":"left","yanchor":"bottom"},showlegend=True)
     fig.update_yaxes(range=[data.columns[-1], 0], row=1, col=1)
 
-    if plot_save:
+    if mastertheseis_save:
         if channel in ["7and8","mean_all"]:
             if channel=="7and8":
                 data_type=78
