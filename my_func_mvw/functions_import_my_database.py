@@ -3,6 +3,7 @@ import pickle
 from collections import defaultdict
 import glob
 import pandas as pd
+from my_func_mvw.functions import read_pickle
 
 ############## PICKLE IMPORTER ######################
 
@@ -136,6 +137,25 @@ def import_my_database_2018_csv(path_to_my_database_2018_csv):
         data_2018[cable_length][channel]=one_file
 
     return data_2018
+
+############## Hybrid IMPORTER or Other ######################
+
+def import_tlogger(path_DTS_processed,importer="pickle"):
+    """meine alten PT100 um 1.5 °C korigiert, ein paar Daten von Solexperts und die neuen PT1000 Daten."""
+    if importer=="csv": # read csv
+        df_Tlogger_PT1000 = pd.read_csv(path_DTS_processed + "\\..\\T-logger\\processed\\Tlogger_PT1000.csv", index_col=[0])
+        df_Tlogger_PT1000.index.names=["Date"]
+        df_Tlogger_PT1000.index = pd.to_datetime(df_Tlogger_PT1000.index)
+
+        df_Tlogger  = pd.read_csv(path_DTS_processed + "\\..\\T-logger\\processed\\Tlogger_all.csv",index_col=[0])
+        df_Tlogger.index.names=["Date"]
+        df_Tlogger.index = pd.to_datetime(df_Tlogger.index)
+
+    elif importer=="pickle": #read_pickle
+        df_Tlogger_PT1000 = read_pickle(path_DTS_processed + "\\..\\T-logger\\processed\\Tlogger_PT1000")
+        df_Tlogger  = read_pickle(path_DTS_processed + "\\..\\T-logger\\processed\\Tlogger_all")
+    
+    return df_Tlogger, df_Tlogger_PT1000
 
 def merge_data_year(list_data_years):
     """input the different year dics as a list

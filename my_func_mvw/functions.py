@@ -142,9 +142,9 @@ def watertank_shift(dataframe, df_Tlogger, watertank_len, watertank_T_range_min,
             
             # Temp of DTS cable at first watertank position
             val_watertank_ch[chan]=dataframe[chan].loc[str(date_name)][watertank_len[watertank_pos]]
-            # Temp of watertank, measured by PT100
+            # Temp of watertank, measured by PT-sensor
             val_watertank=temp_watertank_func([date_name], df_Tlogger, time_diff_warning=time_diff_warning)[0]
-            # difference between PT100 and DTS at first watertank position
+            # difference between PT-sensor and DTS at first watertank position
             # round values may be helpfull for reducing memory, 
             # decimal of 2 would be sufficient for the data accuaracy.
             diff_in_watertank[chan] = val_watertank_ch[chan] - val_watertank
@@ -177,7 +177,7 @@ def write_pickle(path,data):
     with open(path, 'wb') as handle:
         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-def temp_watertank_func(x, df_Tlogger, channel_name = "Channel1-PT100_rolling_mean", time_diff_warning=5):
+def temp_watertank_func(x, df_Tlogger, channel_name = "Channel1_rolling_mean", time_diff_warning=5):
     """returns Temperature of Watertank at given time x, of the moving avearage values
     this is not really a matheamtical function, but I named it like this when I was using a polynomial function
 
@@ -407,7 +407,7 @@ def calc_mean_for_each_segment(channels, calibration_segments, watertank_diff_lo
     
     return calibration_segments_mean_correction, calibration_segments_mean_correction_dates
 
-def plot_segments_mean_correction(calibration_segments_mean_correction,dates,calibration_segments_mean_correction_dates,watertank_diff_log_data_all,df_Tlogger_PT100,watertank_len,ymax=5, ymin=-15, plot_width=16):
+def plot_segments_mean_correction(calibration_segments_mean_correction,dates,calibration_segments_mean_correction_dates,watertank_diff_log_data_all,df_Tlogger,watertank_len,ymax=5, ymin=-15, plot_width=16):
     """"""
     fig,axs=plt.subplots(1,1,figsize=(plot_width,5))
     # Plot border calibration segments
@@ -439,10 +439,10 @@ def plot_segments_mean_correction(calibration_segments_mean_correction,dates,cal
         axs.plot(x,y,label=f"correction for mean of channels {chan_legend}")
 
     # plot watertank Temp for comparisson
-    name="Channel1-PT100_rolling_mean"
-    mean = np.nanmean(df_Tlogger_PT100[name].values)
-    y=df_Tlogger_PT100[name].values - mean
-    x_dates=df_Tlogger_PT100[name].index
+    name="Channel1_rolling_mean"
+    mean = np.nanmean(df_Tlogger[name].values)
+    y=df_Tlogger[name].values - mean
+    x_dates=df_Tlogger[name].index
     axs.plot(x_dates,y,color="black", label="water tank\nshifted to mean = 0")
 
 
@@ -833,7 +833,7 @@ def create_mask_egrt(dataframe,start_date_string="13.07.2021",end_date_string="2
     return mask_not_egrt
 
 
-def diff_to_watertank(data_calc, watertank_len, watertank_T_range_min,watertank_T_range_max,df_Tlogger_PT100,find_nearest_date = find_nearest_date,shorten_input_date=False):
+def diff_to_watertank(data_calc, watertank_len, watertank_T_range_min,watertank_T_range_max,df_Tlogger,find_nearest_date = find_nearest_date,shorten_input_date=False):
     """Calculate differences of corrected values to watertank
     alle variables I need and defined before are as default inputs
 
@@ -863,7 +863,7 @@ def diff_to_watertank(data_calc, watertank_len, watertank_T_range_min,watertank_
             
         for date_name in data_calc_shorten[chan].index:
             #date_numeric=mdates.date2num(date_name)# create numeric of date for calculations
-            val_watertank=temp_watertank_func([date_name], df_Tlogger_PT100)[0]  # T of watertank, measured by PT-sensor
+            val_watertank=temp_watertank_func([date_name], df_Tlogger)[0]  # T of watertank, measured by PT-sensor
             # when using constshift dates which are not in watertank_func range become nan because rolling mean is nan
  
             if chan in ["5","6"] or chan in["5and6"]:
