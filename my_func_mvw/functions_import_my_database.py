@@ -8,7 +8,7 @@ from my_func_mvw.functions import read_pickle
 ############## PICKLE IMPORTER ######################
 
 def import_my_database_pickle(year, path_to_my_database_pickle, controller=3188):
-    """import script for pickle data of 2019+, imports each year seperate"""
+    """import script for unprocessed pickle data of 2019+, imports each year separate."""
     def read_pickle(filename:str):
         #Function to read pickle Files
         with open(filename, 'rb') as f:
@@ -44,7 +44,7 @@ def import_my_database_pickle(year, path_to_my_database_pickle, controller=3188)
     return data_20xx
 
 def import_my_database_2018_pickle(path_to_my_database_2018_pickle):
-    """imports 2018 pickle data"""
+    """imports 2018 unprocessed pickle data"""
     def get_abspath(basepath):
         """Get the files you need to import into your script with Path
         Returns a list of all filepaths (or folderpaths) of the files (or folders) in a repository.
@@ -80,7 +80,7 @@ def import_my_database_2018_pickle(path_to_my_database_2018_pickle):
 ############## CSV IMPORTER ######################
 
 def import_my_database_csv(year,path_to_my_database):
-    """ import the data of my_databse, every year seperate"""
+    """ import the unprocessed data of my_database, every year separate"""
 
     def importer(data_20xx, path_to_my_database, year, c):
         """just for shortening the code"""
@@ -108,7 +108,7 @@ def import_my_database_csv(year,path_to_my_database):
     return data_20xx
 
 def import_my_database_2018_csv(path_to_my_database_2018_csv):
-    """imports 2018 csv data"""
+    """imports unprocessed 2018 csv data"""
     def get_abspath(basepath):
         """Get the files you need to import into your script with Path
         Returns a list of all filepaths (or folderpaths) of the files (or folders) in a repository.
@@ -175,4 +175,27 @@ def merge_data_year(list_data_years):
     #eventle noch sort index machen; the seperate years are already sorted by index during saving
     return data
 
+def import_processed_shaft_temperatures(path_DTS_processed = r"..\Alsdorf\Daten\DTS_processed",importer="pickle"):
+    """"""
+    # import pickle
+    if importer=="pickel":
+        filename=f"\\Schacht_7and8_down"
+        Schacht_7and8_down=read_pickle(path_DTS_processed + r"\shaft_temperatures\egrt_cable\pickle" + filename)
+        filename=f"\\Schacht_7and8_up"
+        Schacht_7and8_up=read_pickle(path_DTS_processed + r"\shaft_temperatures\egrt_cable\pickle" + filename)
 
+    #import csv
+    if importer=="csv":
+        filename=f"\\Schacht_7and8_down.csv"
+        Schacht_7and8_down=pd.read_csv(path_DTS_processed + r"\shaft_temperatures\egrt_cable\csv" + filename, index_col=0)
+        Schacht_7and8_down.index   = pd.to_datetime(Schacht_7and8_down.index, infer_datetime_format=True)
+        Schacht_7and8_down.columns = Schacht_7and8_down.columns.astype(int)
+        Schacht_7and8_down.columns.names = ["Depth [m]"]
+
+        filename=f"\\Schacht_7and8_up.csv"
+        Schacht_7and8_up=pd.read_csv(path_DTS_processed + r"\shaft_temperatures\egrt_cable\pickle" + filename, index_col=0)
+        Schacht_7and8_up.index   = pd.to_datetime(Schacht_7and8_up.index, infer_datetime_format=True)
+        Schacht_7and8_up.columns = Schacht_7and8_up.columns.astype(int)
+        Schacht_7and8_up.columns.names = ["Depth [m]"]
+    
+    return Schacht_7and8_down, Schacht_7and8_up
