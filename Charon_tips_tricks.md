@@ -40,8 +40,9 @@ I had problems creating the connection via Ethernet.
 My problem was toi set the IP address properly.
 I only did that using Charon4.
 From the following
-    * chapter 4.1.1 of ``sciebo\DTS Data\Miscellaneous\Masterthesis_Mathis\Literatur\Manuals\Charon4 - Operation Manual OTS3.pdf``
-    * [what is ip adress and subnet mask](https://community.fs.com/de/blog/know-ip-address-and-subnet-mask.html)
+* chapter 4.1.1 of ``sciebo\DTS Data\Miscellaneous\Masterthesis_Mathis\Literatur\Manuals\Charon4 - Operation Manual OTS3.pdf``
+* [what is ip adress and subnet mask](https://community.fs.com/de/blog/know-ip-address-and-subnet-mask.html)
+
 I concluded this settings ``sciebo`\DTS Data\EONERC\Screenshot\screenshots_during_connection_problems\working_network_settings_of_controller.png``.
 Via USB the network settings can be changed.
 Unplug the usb and plug in Ethernet, if it is set up properly the connection is established.
@@ -58,7 +59,7 @@ In Charon3 this was not a problem
 You can only do this if no measurements (at the device) are running --> Stop Measurements
 
 # Charon4
-See (Readme_Scripts)[https://github.com/mvwick/Scripts_Masterarbeit] for some workflows with Charon4
+See [Readme](./README.md#scripts_masterarbeit) for some workflows with Charon4
 
 # Charon3
 ## Program - Speicherort Daten
