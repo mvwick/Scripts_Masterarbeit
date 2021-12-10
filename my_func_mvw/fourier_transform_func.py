@@ -189,7 +189,7 @@ def plot_fourier_carpet(data,channel,mastertheseis_save=False,zmin=0,zmax=20):
         elif channel=="7and8":
             y0_0=0;y1_0=500;y0_1=1200;y1_1=2200;y0_2=2920;y1_2=3700;wekkly_anno_pos=200
         elif channel in ["1","2","3","4","mean_all"]:
-            y0_0=0;y1_0=180;wekkly_anno_pos=0.9
+            y0_0=0;y1_0=180;wekkly_anno_pos=110
     elif mastertheseis_save==True:
         if channel=="5and6":
             y0_0=0.72;y1_0=1;y0_1=0;y1_1=0.28;  wekkly_anno_pos=0.9

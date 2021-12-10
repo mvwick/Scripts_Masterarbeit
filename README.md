@@ -79,7 +79,7 @@ If you want to change the settings maybe this notes are off help: [I want to set
 2. Go to the Lete data save folder and extract `kanal_1.txt` and `kanal_2.txt` from the data folder.
     * The Lete software will create new files if a new data point is saved.
 3. Create a new folder in `sciebo\DTS Data\Alsdorf\Daten\T-logger` and add the files into it.
-4. Add the path to `kanal_1.txt` to `tlogger_to_python.ipynb` and run the script.
+4. run `tlogger_to_python.ipynb`
 5. New reference temperature measurements are now saved. You should now run the process and analyse scripts to incorporate the newer data in the plots.
 
 ## I want to set up or change settings of the Lete TLogger
