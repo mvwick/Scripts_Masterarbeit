@@ -7,6 +7,7 @@ The data, which the scripts work with, is available on a sciebo repository of th
 If you currently read this from the sciebo repository, consider cloning the scripts folder from [Scripts_Masterarbeit](https://github.com/mvwick/Scripts_Masterarbeit.git).
 The scripts are up-to-date on this sciebo repository but I think it is not a good practice to work or execute them here and create new branches or commits.
 Each collaborator should do that locally.
+This means download the complete DTS Data repository from sciebo and replace the ``Scripts`` folder with a clone of the GitHub repository ([Scripts_Masterarbeit](https://github.com/mvwick/Scripts_Masterarbeit.git))
 Currently I dont follow this, I work directly on the sciebo repository.
 Maybe as a maintainer you are allowed to break your own rules.
 I am the only one using this at the moment anyway, so it doesnt matter.

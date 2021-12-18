@@ -13,6 +13,7 @@ import math
 from copy import deepcopy
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import os
 
 def get_abspath(basepath):
     """Get the files you need to import into your script with Path
@@ -26,6 +27,20 @@ def get_abspath(basepath):
     for entry in basepath:
         df_list.append(entry)
     return (df_list)
+
+def file_len(fname):
+    """returns the number of lines of a file"""
+    with open(fname) as f:
+        for i, l in enumerate(f):
+            pass
+    return i + 1
+
+def number_files(path):
+    """counts the number of files in the repository"""
+    total = 0
+    for root, dirs, files in os.walk(path):
+        total += len(files)
+    return total
 
 def add_nan_val_in_datagaps(data_chan, minutes_gap=35):
     """biggest problem the searching for gaps is static.
