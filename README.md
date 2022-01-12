@@ -16,7 +16,7 @@ I am the only one using this at the moment anyway, so it doesnt matter.
 Some scripts are made for the data of a specific DTS device (Controller: `Alsdorf`, `EONERC`) others are not DTS device related or have inputs for the different devices (Controller: `universal`).
 | Script  | Controller | Description |
 | ------- | ---------- | ----------- |
-| [my_func_mvw](my_func_mvw/)  | universal | functions used in various notebooks of this repository |
+| [my_func_mvw](my_func_mvw/)  | universal | Functions used in various notebooks of this repository |
 | [Alsdorf_Plot_py.py](Alsdorf_Plot_py.py) | Alsdorf | Plotting script for channels 1 to 4 |
 | [EGRT_analysis.ipynb](EGRT_analysis.ipynb) | Alsdorf | Calculation of depth dependent apparent effective thermal conductivity, form data measured by Solexperts |
 | [analyse_ch1-4_my_database_alsdorf.ipynb](analyse_ch1-4_my_database_alsdorf.ipynb) | Alsdorf | Various plots and analyses of channels 1 to 4. Highlights are histogram of water tank difference, difference to PTSal log from 24.11.2020, length dependent difference between channels.|
@@ -41,7 +41,7 @@ Some scripts are made for the data of a specific DTS device (Controller: `Alsdor
 | [old_versions/compare.ipynb](old_versions/compare.ipynb) | Alsdorf | compare the data created by merge_files.ipynb to data in the databse |
 | [old_versions/merge_files.ipynb](old_versions/merge_files.ipynb) | Alsdorf | converts Charon4 data into less files, used for old data repository I found on the PC |
 | [old_versions/compilation_of_helpfull_code.ipynb](old_versions/compilation_of_helpfull_code.ipynb) | universal | Code which has no use currently but may be helpfull in the future |
-| [old_versions/upload_my_database.bat](old_versions/upload_my_database.bat) | universal |has been used to copy data to the sciebo repositoy|
+| [old_versions/upload_my_database.bat](old_versions/upload_my_database.bat) | universal |Has been used to copy data to the sciebo repositoy|
 
 # How To ...
 In the following are explained some workflows, which aim to facilitate the begin of the work with the GGE-DTS.
