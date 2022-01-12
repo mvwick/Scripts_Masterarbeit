@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """
+plotting script of alsdorf channels 1 to 4 from Daniel 
+
 Created on Wed May  6 22:07:14 2020
 
 @author: Daniel
