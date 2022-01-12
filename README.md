@@ -12,6 +12,37 @@ Currently I dont follow this, I work directly on the sciebo repository.
 Maybe as a maintainer you are allowed to break your own rules.
 I am the only one using this at the moment anyway, so it doesnt matter.
 
+# Overview Scripts
+Some scripts are made for the data of a specific DTS device (Controller: `Alsdorf`, `EONERC`) others are not DTS device related or have inputs for the different devices (Controller: `universal`).
+| Script  | Controller | Description |
+| ------- | ---------- | ----------- |
+| [my_func_mvw](my_func_mvw/)  | universal | functions used in various notebooks of this repository |
+| [Alsdorf_Plot_py.py](Alsdorf_Plot_py.py) | Alsdorf | Plotting script for channels 1 to 4 |
+| [EGRT_analysis.ipynb](EGRT_analysis.ipynb) | Alsdorf | Calculation of depth dependent apparent effective thermal conductivity, form data measured by Solexperts |
+| [analyse_ch1-4_my_database_alsdorf.ipynb](analyse_ch1-4_my_database_alsdorf.ipynb) | Alsdorf | Various plots and analyses of channels 1 to 4. Highlights are histogram of water tank difference, difference to PTSal log from 24.11.2020, length dependent difference between channels.|
+| [analyse_my_database_alsdorf.ipynb](analyse_my_database_alsdorf.ipynb) | Alsdorf | Mostly channels 5 to 8 are analysed. Highlights are interactive plot of data, statistics of difference at water tank positions of channels 5 to 8, differences between channels (also between channels of both cables), linear trend analysis, difference of up and down measurements |
+| [analyse_shaft_temperature.ipynb](analyse_shaft_temperature.ipynb) | Alsdorf | Only the shaft temperature measurements from the mean of channels 7 and 8 on its own are analysed. Difference of up and down is plotted and variability over time shown. |
+| [charon3_txt_to_python_and_merge_EONERC.ipynb](charon3_txt_to_python_and_merge_EONERC.ipynb) | EONERC | Loads the data exported with Charon3 and saves them in an easier to acces format |
+| [charon4_txt_to_python.ipynb](charon4_txt_to_python.ipynb) | universal | Loads the data exported with Charon4 and saves them in an easier to acces format |
+| [charon4_txt_to_python_2018data.ipynb](charon4_txt_to_python_2018data.ipynb) | Alsdorf | Loads the data exported with Charon4 from 2018 and saves them in an easier to acces format |
+| [compare_both_devices.ipynb](compare_both_devices.ipynb) | Alsdorf | Compares (calculate differences) the measurements of Solexperts with the measurements made with the Lios device |
+| [compare_ch14_to_heatexchanger_usage_and_EGRT.ipynb](compare_ch14_to_heatexchanger_usage_and_EGRT.ipynb) | Alsdorf | Borehole Heat Exchanger (BHE) usage is compared to the DTS measurements (channels 1 to 4). Additionally Enhanced Geothermal Response Test (EGRT) heating phases are compared to channels 1 to 4. |
+| [frequency_analysis.ipynb](frequency_analysis.ipynb) | Alsdorf | Frequency dependence of channels 1 to 8 is analysed, using a fast fourier transformation. The frequqncy is also analysed depth dependent resulting in carpet plots.|
+| [my_database_script.ipynb](my_database_script.ipynb) | Alsdorf | Creates some basic plots. The idea of this notebook is to get an overview of the data, which comes directly from the DTS device, without processesing. |
+| [my_database_script_EONERC.ipynb](my_database_script_EONERC.ipynb) | EONERC | Creates some basic plots. The idea of this notebook is to get an overview of the data, which comes directly from the DTS device, without processesing. |
+| [process_ch1-4.ipynb](process_ch1-4.ipynb) | Alsdorf | Processing of channels 1 to 4. |
+| [process_ch5-8.ipynb](process_ch5-8.ipynb) | Alsdorf | Processing of channels 5 to 8. |
+| [raw_backscattered_to_temp.ipynb](raw_backscattered_to_temp.ipynb) | universal | Calcualte temperature values from the raw data (stokes and anti-stokes) |
+| [raw_backscattered_to_temp_from_Charon3.ipynb](raw_backscattered_to_temp_from_Charon3.ipynb) | universal | Calcualte temperature values from the raw data (stokes and anti-stokes). Additionally calculate dB (exported by Charon3) into counts. |
+| [shaft_water_rise.ipynb](shaft_water_rise.ipynb) | Alsdorf | Monitoring of the shaft water rise of all channels. |
+| [tlogger_to_python.ipynb](tlogger_to_python.ipynb) | Alsdorf | Data from Lete TLogger is smoothed, ploted and saved in an easy to acces format. |
+| [Charon_tips_tricks.md](Charon_tips_tricks.md) | universal | Various hints and learnings I discovered during using the Charon software |
+| [old_versions/MWE_plotly_problem.ipynb](old_versions/MWE_plotly_problem.ipynb) | universal  | Example notebook for a Issue I created for plotly |
+| [old_versions/compare.ipynb](old_versions/compare.ipynb) | Alsdorf | compare the data created by merge_files.ipynb to data in the databse |
+| [old_versions/merge_files.ipynb](old_versions/merge_files.ipynb) | Alsdorf | converts Charon4 data into less files, used for old data repository I found on the PC |
+| [old_versions/compilation_of_helpfull_code.ipynb](old_versions/compilation_of_helpfull_code.ipynb) | universal | Code which has no use currently but may be helpfull in the future |
+| [old_versions/upload_my_database.bat](old_versions/upload_my_database.bat) | universal |has been used to copy data to the sciebo repositoy|
+
 # How To ...
 In the following are explained some workflows, which aim to facilitate the begin of the work with the GGE-DTS.
 
