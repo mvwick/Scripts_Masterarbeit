@@ -3,12 +3,15 @@ import pickle
 from collections import defaultdict
 import glob
 import pandas as pd
-from my_func_mvw.functions import read_pickle
+import numpy as np
+from my_func_mvw.functions import read_pickle, get_abspath
 
 ############## PICKLE IMPORTER ######################
 
 def import_my_database_pickle(year, path_to_my_database_pickle, controller=3188):
-    """import script for unprocessed pickle data of 2019+, imports each year separate."""
+    """import script for unprocessed pickle data of 2019+, imports each year separate.
+    add option to import all years at once
+    """
     def read_pickle(filename:str):
         #Function to read pickle Files
         with open(filename, 'rb') as f:
@@ -26,7 +29,7 @@ def import_my_database_pickle(year, path_to_my_database_pickle, controller=3188)
 
     path_to_file={}
     data_20xx = {}
-    if year == 2021: # all channels are activated since 01.06.2021
+    if year in np.arange(2021,2100): # all channels are activated since 01.06.2021
         if controller == 3188:
             channels = [1,2,3,4,5,6,7,8]
         elif controller == 3195:
@@ -40,7 +43,7 @@ def import_my_database_pickle(year, path_to_my_database_pickle, controller=3188)
             channels = [1,2,3,4]
             for c in channels:
                 importer_pickle(data_20xx, path_to_my_database_pickle, year, c)
-
+    
     return data_20xx
 
 def import_my_database_2018_pickle(path_to_my_database_2018_pickle):
@@ -95,7 +98,7 @@ def import_my_database_csv(year,path_to_my_database):
 
     path_to_file={}
     data_20xx = {}
-    if year == 2021: # all channels are activated since 01.06.2021
+    if year in np.arange(2021,2100): # all channels are activated since 01.06.2021
         channels = [1,2,3,4,5,6,7,8]
         for c in channels:
             importer(data_20xx, path_to_my_database, year, c)
@@ -139,6 +142,37 @@ def import_my_database_2018_csv(path_to_my_database_2018_csv):
     return data_2018
 
 ############## Hybrid IMPORTER or Other ######################
+
+def import_complete_database(path_to_database,importer="pickle",import_my_database_pickle=import_my_database_pickle,import_my_database_csv=import_my_database_csv,controller=3188):
+    """imports all files of the database at once"""
+    abs_paths = get_abspath(path_to_database+"\\*") #all paths to every file
+
+    lists_year_channels={} #contains for every year the avaible channels, of the database
+    for name in abs_paths: #fiend the avaible data
+        partition = name.partition("\\temp_ch")[-1].partition("_")
+        if importer=="pickle":
+            channel=partition[0]
+            year=partition[2]
+        elif importer=="csv":
+            channel=partition[0]
+            year=partition[2][:-4]
+
+        if year not in lists_year_channels.keys():
+            lists_year_channels[year]=[channel]
+        else:
+            if channel not in lists_year_channels[year]:
+                lists_year_channels[year].append(channel)
+            else:
+                print("unexpected behaviour, two files have the same description for channel and year")
+
+    data_year_seperated={}
+    for year in lists_year_channels.keys(): #import the data
+        if importer=="pickle":
+            data_year_seperated[year]=import_my_database_pickle(int(year), path_to_my_database_pickle=path_to_database,controller=controller)
+        elif importer=="csv":
+            data_year_seperated[year]=import_my_database_csv(int(year), path_to_my_database=path_to_database)
+    
+    return data_year_seperated
 
 def import_tlogger(path_DTS_processed,importer="pickle"):
     """meine alten PT100 um 1.5 °C korigiert, ein paar Daten von Solexperts und die neuen PT1000 Daten."""
