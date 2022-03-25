@@ -77,7 +77,7 @@ You will need about 10 minutes to import all data.
 5. Now import the data from the EONERC. Go to `sciebo\DTS Data\EONERC\Data\unprocessed\mex_backup` and import all `.mex4` files. When the import is finished your Charon4 now contains all available data from EONERC.
 
 ## I want to add new DTS data to the database
-First you should take a look at *where to start?*, if you are here the first time.
+First you should take a look at [where to start?](#where-to-start?-it-is-the-first-time-i-am-here.), if you are here the first time.
 Additionally, you should consider [installing Charon4 and import all available data](#install-charon4-and-import-all-available-data) on you working PC.
 My workflow is to export the data from the measurement site as `.mex4`.
 I then import these files in my "personal" Charon4 installation.
