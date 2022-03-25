@@ -77,7 +77,7 @@ You will need about 10 minutes to import all data.
 5. Now import the data from the EONERC. Go to `sciebo\DTS Data\EONERC\Data\unprocessed\mex_backup` and import all `.mex4` files. When the import is finished your Charon4 now contains all available data from EONERC.
 
 ## I want to add new DTS data to the database
-First you should take a look at [where to start?](#where-to-start?-it-is-the-first-time-i-am-here.), if you are here the first time.
+First you should take a look at [where to start?](#where-to-start-it-is-the-first-time-i-am-here), if you are here the first time.
 Additionally, you should consider [installing Charon4 and import all available data](#install-charon4-and-import-all-available-data) on you working PC.
 My workflow is to export the data from the measurement site as `.mex4`.
 I then import these files in my "personal" Charon4 installation.
@@ -96,12 +96,13 @@ This workflow is described in the following.
     1. Click on the controller number you want to export from, it needs to be selected.
     2. top left corner *Charon Symbol*, *Export*, *Measurement Data (.txt)*
     3. New window opens: select the time range you want to export, use a range which overlaps with the before exported data time range, the scripts in this repository will filter duplicates.
-    4. *Path*: Create a new folder in `sciebo\DTS Data\Alsdorf\Daten\unprocessed\Charon4\charon4_export_as_txt` and add the path from the new folder.
+    4. *Path*: Create a new folder in `sciebo\DTS Data\Alsdorf\Daten\unprocessed\Charon4\charon4_export_as_txt` or `sciebo\DTS Data\EONERC\Daten\unprocessed\charon4_export_as_txt` and add the path from the new folder.
     5. For all other settings use the same as given in `charon4_txt_to_python.ipynb`.
 4. Add the path to the controller of the `.txt` repository to `charon4_txt_to_python.ipynb`, adapt the inputs for the used device (3195 or 3188).
 5. Run `charon4_txt_to_python.ipynb`, this takes a few minutes.
-6. Run the process scripts
-7. The new data is now saved. You should now run the analyse scripts to incorporate the newer data in the plots.
+6. For EONERC only: run `charon3_txt_to_python_and_merge_EONERC.ipynb` to merge the new data with all other avaible data
+7. Run the process scripts (not yet implemented for EONERC)
+8. The new data is now saved. You should now run the analyse scripts (or `my_database_script` for a first overview) to incorporate the new data in the plots.
 
 ## I want to add new reference temperature data (TLogger) to the database - Currently only in Alsdorf
 Currently the logging device needs a permanent connection to the PC, otherwise the logging stops and needs to be started manually again.
