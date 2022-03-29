@@ -91,7 +91,7 @@ def import_my_database_csv(year,path_to_my_database):
         path_to_file[filename] = path_to_my_database + "\\" + filename
 
         data_20xx[str(c)]         = pd.read_csv(path_to_file[f"temp_ch{c}_{year}.csv"], index_col=0)
-        data_20xx[str(c)].index   = pd.to_datetime(data_20xx[str(c)].index, infer_datetime_format=True)
+        data_20xx[str(c)].index   = pd.to_datetime(data_20xx[str(c)].index, infer_datetime_format=True).tz_localize(None)
         data_20xx[str(c)].columns = data_20xx[str(c)].columns.astype(int)
 
         return data_20xx
@@ -134,7 +134,7 @@ def import_my_database_2018_csv(path_to_my_database_2018_csv):
         channel=partition[2][:-4]
 
         one_file         = pd.read_csv(path, index_col=0)
-        one_file.index   = pd.to_datetime(one_file.index, infer_datetime_format=True)
+        one_file.index   = pd.to_datetime(one_file.index, infer_datetime_format=True).tz_localize(None)
         one_file.columns = one_file.columns.astype(float) #!!!!!!!different to other years
         
         data_2018[cable_length][channel]=one_file
@@ -222,13 +222,13 @@ def import_processed_shaft_temperatures(path_DTS_processed = r"..\Alsdorf\Daten\
     if importer=="csv":
         filename=f"\\Schacht_7and8_down.csv"
         Schacht_7and8_down=pd.read_csv(path_DTS_processed + r"\shaft_temperatures\egrt_cable\csv" + filename, index_col=0)
-        Schacht_7and8_down.index   = pd.to_datetime(Schacht_7and8_down.index, infer_datetime_format=True)
+        Schacht_7and8_down.index   = pd.to_datetime(Schacht_7and8_down.index, infer_datetime_format=True).tz_localize(None)
         Schacht_7and8_down.columns = Schacht_7and8_down.columns.astype(int)
         Schacht_7and8_down.columns.names = ["Depth [m]"]
 
         filename=f"\\Schacht_7and8_up.csv"
         Schacht_7and8_up=pd.read_csv(path_DTS_processed + r"\shaft_temperatures\egrt_cable\pickle" + filename, index_col=0)
-        Schacht_7and8_up.index   = pd.to_datetime(Schacht_7and8_up.index, infer_datetime_format=True)
+        Schacht_7and8_up.index   = pd.to_datetime(Schacht_7and8_up.index, infer_datetime_format=True).tz_localize(None)
         Schacht_7and8_up.columns = Schacht_7and8_up.columns.astype(int)
         Schacht_7and8_up.columns.names = ["Depth [m]"]
     
